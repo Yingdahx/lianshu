@@ -21,5 +21,7 @@ from lianshu_app import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('push/',views.push),
+    path('push_station/',views.push_station),
     url(r'^station$',views.station), 
+
 ]

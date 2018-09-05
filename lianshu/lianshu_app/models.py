@@ -43,7 +43,6 @@ class Gtw_info(models.Model):
 	def __str__(self):
 		return 'gtw_id:' + self.gtw_id + '     绑定数据:' + str(self.data.data_id)
  
-
 class ExtraProperty(models.Model):
 	class Meta:
 		verbose_name = verbose_name_plural = 'ExtraProperty'
@@ -52,5 +51,36 @@ class ExtraProperty(models.Model):
 
 	def __str__(self):
 		return '绑定数据:' + str(self.data.data_id)
+
+class Station(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = '小压站'
+
+	station_id = models.CharField(max_length=200,default='',verbose_name = '小站标识ID')
+	spillover = models.CharField(max_length=200,default='',verbose_name = '满溢度(百分比)')
+	add_time = models.DateTimeField(auto_now_add=True,verbose_name='创建时间')
+	update_time = models.DateTimeField(auto_now=True,verbose_name='修改时间')
+
+	def __str__(self):
+		return '小站ID：' + self.station_id + '      满溢度（百分比）' +  self.spillover
+
+class Sensor(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = '小压站下的传感器数据'
+
+	station = models.ForeignKey(Station,on_delete=models.CASCADE,verbose_name='小压站')
+	sensor_type = models.CharField(max_length=20,default='',verbose_name='传感器类型 目前为0~2')
+	status = models.CharField(max_length=20,default='',verbose_name='传感器状态:0-正常 1-非正常')
+	rawdata = models.CharField(max_length=50,default='',verbose_name='数据采集的原始数据')
+	datatime = models.CharField(max_length=100,default='',verbose_name='数据采集时间')
+	add_time = models.DateTimeField(auto_now_add=True,verbose_name='入库时间')
+	update_time = models.DateTimeField(auto_now=True,verbose_name='更新时间')
+
+	def __str__(self):
+		return '传感器类型：' + self.sensor_type + '传感器状态：' + self.status + '数据采集时间:' + self.datatime + '入库时间:' + str(self.add_time)
+ 
+
+			
+			
 
 
