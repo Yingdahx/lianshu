@@ -4,6 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from lianshu_app.models import *
 
 import json
+import random
+import time,datetime
 
 @csrf_exempt
 def push(request):
@@ -54,3 +56,42 @@ def push(request):
     		extra.save()
 
     return JsonResponse({ 'success': True })
+
+@csrf_exempt
+def station(request):
+    ctx = {}
+    station_id = request.GET.get('station_id')
+    print(station_id)
+
+    #模拟数据
+    alives = [True,False]
+    now = datetime.datetime.now()
+    nowstr = now.strftime("%Y-%m-%d %H:%M:%S")
+    nowArray = time.strptime(nowstr, "%Y-%m-%d %H:%M:%S")
+    timeStamp1 = int(time.mktime(nowArray))
+
+    time2 = now + datetime.timedelta(days=-1)
+    time2str = time2.strftime("%Y-%m-%d %H:%M:%S")
+    time2Array = time.strptime(time2str,"%Y-%m-%d %H:%M:%S")
+    time2Stamp2 = int(time.mktime(time2Array))
+    
+    ctx['station_id'] = int(station_id)
+    ctx['is_alive'] = alives[random.randint(0,1)]
+    ctx['trunk_num'] = random.randint(0,5)
+    ctx['capacity'] = random.randint(1,99)
+    ctx['operation_num'] = random.randint(0,20)
+    ctx['update_time'] = timeStamp1
+    ctx['online_time'] = time2Stamp2
+
+    return  JsonResponse(ctx,safe=False)
+
+
+
+
+
+
+
+
+
+
+
