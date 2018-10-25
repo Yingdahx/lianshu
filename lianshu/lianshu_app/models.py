@@ -4,6 +4,7 @@ class Push_data(models.Model):
 	class Meta:
 		verbose_name = verbose_name_plural = '接收数据'
 
+	#DecimalField类型max_digits-总位数，decimal_places-小数点后精确位数
 	data_id = models.DecimalField(max_digits=20,decimal_places=1,verbose_name='ID')
 	deveui = models.CharField(max_length=200,default='',verbose_name='设备的EUI')
 	timestamp = models.CharField(max_length=200,default='',verbose_name='数据上报时间')
