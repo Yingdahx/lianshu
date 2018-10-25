@@ -41,7 +41,8 @@ def push(request):
     data.latitude = raw['latitude']
     data.save()
 
-    if raw['gtw_info']:
+
+    if 'gtw_info' in raw.keys() and raw['gtw_info']:
     	for r in raw['gtw_info']:
     		gtw = Gtw_info()
     		gtw.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = raw['timestamp']).first()
@@ -50,7 +51,7 @@ def push(request):
     		gtw.snr = r['snr']
     		gtw.save()
 
-    if raw['ExtraProperty']:
+    if 'ExtraProperty' in raw.keys() and raw['ExtraProperty']:
     	for e in raw['ExtraProperty']:
     		extra = ExtraProperty()
     		extra.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = raw['timestamp']).first()
