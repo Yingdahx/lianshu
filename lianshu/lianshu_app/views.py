@@ -7,6 +7,7 @@ import json
 import random
 import requests
 import time,datetime
+import base64
 
 
 #格林威治时间转换
@@ -25,6 +26,13 @@ def timechange(timestr):
     new_str = time.strftime('%Y-%m-%d %H:%M:%S',tuple(timelist))
     return new_str
 
+def base64_decode(base64_str):
+    #test
+    #input -> 'VEVxQ0FRQUNBZ0FDQXdBQUVBQkRSZ0FCSUJnUUpoVUNSek1BQUFBQUFBQ1FBQUFBQUFBQUFBPT0=' 
+    #return -> 'TEqCAQACAgACAwAAEABDRgABIBgQJhUCRzMAAAAAAACQAAAAAAAAAA=='
+    enstr = base64.b64decode(base64_str.encode('utf-8'))
+    return str(enstr,'utf-8')
+
 
 @csrf_exempt
 def push(request):
@@ -36,9 +44,11 @@ def push(request):
     data = Push_data()
     data.data_id = raw['id']
     data.deveui = raw['deveui']
+    #格林威治时间转为北京时区时间字串
     data.timestamp = timechange(raw['timestamp'])
     data.devaddr = raw['devaddr']
-    data.dataFrame = raw['dataFrame']
+    #没解码就base64解码出来保存 已经解码了就直接保存
+    data.dataFrame = raw['dataFrame'] if raw['decrypted'] == 'True' else base64_decode(raw['dataFrame'])
     data.fcnt = raw['fcnt']
     data.port = raw['port']
     data.rssi = raw['rssi']
