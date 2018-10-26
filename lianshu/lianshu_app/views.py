@@ -8,6 +8,24 @@ import random
 import requests
 import time,datetime
 
+
+#格林威治时间转换
+def timechange(timestr):
+    #'2018-10-26T06:25:04.845Z'
+    try:
+        timestr = timestr.split('.')[0]
+    except:
+        print(timestr+'传入的格林威治时间字符串没有.字符分割')
+        pass
+    #str -> time -> list
+    timetuple = time.strptime(timestr,'%Y-%m-%dT%H:%M:%S')
+    timelist = list(timetuple)
+    #时区与北京市区相差8小时 list -> time -> str
+    timelist[3] = timelist[3] + 8
+    new_str = time.strftime('%Y-%m-%d %H:%M:%S',tuple(timelist))
+    return new_str
+
+
 @csrf_exempt
 def push(request):
     #被动接收的数据接口
@@ -18,7 +36,7 @@ def push(request):
     data = Push_data()
     data.data_id = raw['id']
     data.deveui = raw['deveui']
-    data.timestamp = raw['timestamp']
+    data.timestamp = timechange(raw['timestamp'])
     data.devaddr = raw['devaddr']
     data.dataFrame = raw['dataFrame']
     data.fcnt = raw['fcnt']
@@ -78,13 +96,13 @@ def station(request):
     time2Array = time.strptime(time2str,"%Y-%m-%d %H:%M:%S")
     time2Stamp2 = int(time.mktime(time2Array))
     
-    ctx['station_id'] = int(station_id)
-    ctx['is_alive'] = alives[random.randint(0,1)]
-    ctx['trunk_num'] = random.randint(0,5)
-    ctx['spillover'] = random.randint(1,99)
-    ctx['operation_num'] = random.randint(0,20)
-    ctx['update_time'] = timeStamp1
-    ctx['online_time'] = time2Stamp2
+    ctx['station_id'] = int(float(station_id))    #小压站ID
+    ctx['is_alive'] = alives[random.randint(0,1)] #设备是否在线 
+    ctx['trunk_num'] = random.randint(0,5)        #今天第几箱垃圾
+    ctx['spillover'] = random.randint(1,99)       #(当前箱垃圾的满溢度百分比) int (大于0小于100)
+    ctx['operation_num'] = random.randint(0,20)   #(垃圾翻斗动作了几次) int
+    ctx['update_time'] = timeStamp1               #(上次收到数据的时间) int （unix 时间戳）
+    ctx['online_time'] = time2Stamp2              #(设备上线时间) int （unix 时间戳）
 
     return  JsonResponse(ctx,safe=False)
 

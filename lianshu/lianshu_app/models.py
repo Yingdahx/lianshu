@@ -20,10 +20,10 @@ class Push_data(models.Model):
 	sf_used = models.DecimalField(max_digits=5,decimal_places=1,verbose_name = 'sf_used')
 	dr_used = models.CharField(max_length=200,default='',verbose_name = 'dr_used')
 	cr_used = models.CharField(max_length=200,default='',verbose_name = 'cr_used')
-	device_redundancy = models.DecimalField(max_digits=5, decimal_places=1,verbose_name = 'device_redundancy')
+	device_redundancy = models.DecimalField(max_digits=5, decimal_places=1,verbose_name = 'device_redundancy')#冗余
 	time_on_air_ms = models.DecimalField(max_digits=10, decimal_places=3,verbose_name = 'time_on_air_ms')
-	decrypted = models.CharField(max_length=200,default='',verbose_name = 'decrypted')
-	status = models.CharField(max_length=200,default='',verbose_name = 'status')
+	decrypted = models.CharField(max_length=200,default='',verbose_name = '是否解密(decrypted)') #
+	status = models.CharField(max_length=200,default='',verbose_name = '是否在线(status)')
 	address = models.CharField(max_length=200,default='',verbose_name = 'address')
 	name = models.CharField(max_length=200,default='',null=True,verbose_name = 'name')
 	longitude = models.DecimalField(max_digits=15,decimal_places=1,verbose_name = 'longitude')
