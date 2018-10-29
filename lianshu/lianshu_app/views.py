@@ -42,6 +42,11 @@ def push(request):
         return JsonResponse({ 'success': False, 'code': -1, 'msg': '只支持POST' }, status=405)
 
     raw = json.loads(request.body.decode('utf-8'))
+
+    json_root = settings.MEDIA_ROOT  + '%d.json' % time.time()  #json保存路径
+    with open(json_root, 'w') as f:
+      f.write(json.dumps(raw))
+
     data = Push_data()
     data.data_id = raw['id']
     data.deveui = raw['deveui']
