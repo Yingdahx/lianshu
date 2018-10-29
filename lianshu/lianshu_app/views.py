@@ -78,7 +78,7 @@ def push(request):
     data.longitude = raw['longitude']
     data.latitude = raw['latitude']
     data.save()
-
+    print('push_data 原数据落地')
 
     if 'gtw_info' in raw.keys() and raw['gtw_info']:
         for r in raw['gtw_info']:

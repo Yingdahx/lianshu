@@ -49,9 +49,15 @@ class ExtraProperty(models.Model):
 		verbose_name = verbose_name_plural = 'ExtraProperty'
 
 	data = models.ForeignKey(Push_data,on_delete=models.CASCADE,verbose_name='绑定数据')
+	devId = models.CharField(max_length=50,default='',verbose_name='devId')
+	extra_id = models.CharField(max_length=50,default='',verbose_name='extra_id')
+	name = models.CharField(max_length=50,default='',verbose_name='name')
+	value = models.CharField(max_length=50,default='',verbose_name='value')
+
+
 
 	def __str__(self):
-		return '绑定数据:' + str(self.data.data_id)
+		return '绑定数据:' + self.data.devId + 'devId:' + self.devId +'extra_id:' + self.extra_id
 
 class Station(models.Model):
 	class Meta:
