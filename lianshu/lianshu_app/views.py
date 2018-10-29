@@ -94,10 +94,10 @@ def push(request):
             print("raw['ExtraProperty']list内的遍历数据为：",e)
             extra = ExtraProperty()
             extra.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = raw['timestamp']).first()
-            extra.devId = e.devId
-            extra.extra_id = e.id
-            extra.name = e.name
-            extra.value = e.value
+            extra.devId = e['devId']
+            extra.extra_id = e['id']
+            extra.name = e['name']
+            extra.value = e['value']
             extra.save()
 
     return JsonResponse({ 'success': True })
