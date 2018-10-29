@@ -47,6 +47,7 @@ def push(request):
     # json_root = settings.MEDIA_ROOT  + '%d.json' % time.time()  #json保存路径
     # with open(json_root, 'w') as f:
     #   f.write(json.dumps(raw))
+    print('推送数据：',raw)
 
     data = Push_data()
     data.data_id = raw['id']
@@ -92,6 +93,10 @@ def push(request):
     	for e in raw['ExtraProperty']:
     		extra = ExtraProperty()
     		extra.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = raw['timestamp']).first()
+            extra.devId = e.devId
+            extra.extra_id = e.id
+            extra.name = e.name
+            extra.value = e.value
     		extra.save()
 
     return JsonResponse({ 'success': True })
