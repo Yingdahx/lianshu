@@ -72,7 +72,7 @@ class Frame_data(models.Model):
 	online_time = models.IntegerField(default=0,verbose_name='设备上线时间')
 
 	def __str__(self):
-		return '小压站:' + self.data.data_id 
+		return '小压站:' + str(self.data.data_id)
 			
 
 class Station(models.Model):
