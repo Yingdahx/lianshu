@@ -31,12 +31,13 @@ def base64_decode(base64_str):
     #input -> 'VEVxQ0FRQUNBZ0FDQXdBQUVBQkRSZ0FCSUJnUUpoVUNSek1BQUFBQUFBQ1FBQUFBQUFBQUFBPT0=' 
     #return -> 'TEqCAQACAgACAwAAEABDRgABIBgQJhUCRzMAAAAAAACQAAAAAAAAAA=='
     enstr = base64.b64decode(base64_str.encode('utf-8'))
+    #报错点
     return str(enstr,'utf-8')
 
 
 @csrf_exempt
 def push(request):
-    #被动接收的数据接口
+    #需求1 : 被动接收数据接口
     if request.method != 'POST':
         return JsonResponse({ 'success': False, 'code': -1, 'msg': '只支持POST' }, status=405)
 
@@ -48,6 +49,7 @@ def push(request):
     data.timestamp = timechange(raw['timestamp'])
     data.devaddr = raw['devaddr']
     #没解码就base64解码出来保存 已经解码了就直接保存
+    print('接受数据的decrypted字段：',raw['decrypted'])
     data.dataFrame = raw['dataFrame'] if raw['decrypted'] == 'True' else base64_decode(raw['dataFrame'])
     data.fcnt = raw['fcnt']
     data.port = raw['port']
@@ -89,7 +91,7 @@ def push(request):
 
 @csrf_exempt
 def station(request):
-    #单个小压站状态数据请求
+    #需求2:单个小压站状态数据查询请求
     ctx = {}
     station_id = request.GET.get('station')
     print(station_id)
@@ -139,7 +141,7 @@ def push_station(request):
 
 @csrf_exempt
 def test(request):
-    #每15分钟推送一次数据到指定url接口上
+    #需求3：定时任务测试 每15分钟推送一次数据到指定url接口上
     now = datetime.datetime.now()
     print('-----begin-----')
     print(now)
