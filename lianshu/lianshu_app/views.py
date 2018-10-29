@@ -30,7 +30,7 @@ def timechange(timestr):
 def base64_decode(base64_str):
     enstr = base64.b64decode(base64_str.encode('utf-8'))  #base64解码 16进制bytes
     strlist = [ int(hex(x),16) for x in enstr ] 
-    reslist = [   _[2:]    for _ in strlist ]    #去掉头
+    reslist = [   str(_)[2:]    for _ in strlist ]    #去掉头
     return reslist
 
 
@@ -94,7 +94,7 @@ def push(request):
     frame.save()
     print('base64解析入库完成')
 
-    
+
     if 'gtw_info' in raw.keys() and raw['gtw_info']:
         for r in raw['gtw_info']:
             gtw = Gtw_info()

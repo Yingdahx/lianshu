@@ -18,3 +18,5 @@ admin.site.register(Gtw_info)
 admin.site.register(ExtraProperty)
 admin.site.register(Station)
 admin.site.register(Sensor)
+admin.site.register(Frame_data)
+
