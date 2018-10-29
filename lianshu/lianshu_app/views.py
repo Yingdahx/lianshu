@@ -44,9 +44,9 @@ def push(request):
 
     raw = json.loads(request.body.decode('utf-8'))
 
-    json_root = settings.MEDIA_ROOT  + '%d.json' % time.time()  #json保存路径
-    with open(json_root, 'w') as f:
-      f.write(json.dumps(raw))
+    # json_root = settings.MEDIA_ROOT  + '%d.json' % time.time()  #json保存路径
+    # with open(json_root, 'w') as f:
+    #   f.write(json.dumps(raw))
 
     data = Push_data()
     data.data_id = raw['id']
@@ -57,7 +57,7 @@ def push(request):
     #没解码就base64解码出来保存 已经解码了就直接保存
     print('接受数据的decrypted字段：',raw['decrypted'])
     print("raw['decrypted'] == 'True':",raw['decrypted'] == 'True')
-    data.dataFrame = raw['dataFrame'] if raw['decrypted'] == 'True' else base64_decode(raw['dataFrame'])
+    data.dataFrame = raw['dataFrame'] #if raw['decrypted'] == 'True' else base64_decode(raw['dataFrame'])
     data.fcnt = raw['fcnt']
     data.port = raw['port']
     data.rssi = raw['rssi']
