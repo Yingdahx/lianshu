@@ -91,6 +91,7 @@ def push(request):
 
     if 'ExtraProperty' in raw.keys() and raw['ExtraProperty']:
         for e in raw['ExtraProperty']:
+            print("raw['ExtraProperty']list内的遍历数据为：",e)
             extra = ExtraProperty()
             extra.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = raw['timestamp']).first()
             extra.devId = e.devId
