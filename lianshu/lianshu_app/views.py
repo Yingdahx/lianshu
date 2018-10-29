@@ -53,12 +53,13 @@ def push(request):
     data.data_id = raw['id']
     data.deveui = raw['deveui']
     #格林威治时间转为北京时区时间字串
-    data.timestamp = timechange(raw['timestamp'])
+    timestr = timechange(raw['timestamp'])
+    data.timestamp = timestr
     data.devaddr = raw['devaddr']
     #没解码就base64解码出来保存 已经解码了就直接保存
     print('接受数据的decrypted字段：',raw['decrypted'])
-    print("raw['decrypted'] == 'True':",raw['decrypted'] == 'True')
-    data.dataFrame = raw['dataFrame'] #if raw['decrypted'] == 'True' else base64_decode(raw['dataFrame'])
+    print("raw['decrypted']:", raw['decrypted'])
+    data.dataFrame = raw['dataFrame'] if raw['decrypted'] else base64_decode(raw['dataFrame'])
     data.fcnt = raw['fcnt']
     data.port = raw['port']
     data.rssi = raw['rssi']
@@ -78,12 +79,11 @@ def push(request):
     data.longitude = raw['longitude']
     data.latitude = raw['latitude']
     data.save()
-    print('push_data 原数据落地')
 
     if 'gtw_info' in raw.keys() and raw['gtw_info']:
         for r in raw['gtw_info']:
             gtw = Gtw_info()
-            gtw.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timechange(raw['timestamp'])).first()
+            gtw.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
             gtw.gtw_id = r['gtw_id']
             gtw.rssi = r['rssi']
             gtw.snr = r['snr']
@@ -91,16 +91,13 @@ def push(request):
 
     if 'ExtraProperty' in raw.keys() and raw['ExtraProperty']:
         for e in raw['ExtraProperty']:
-            print("raw['ExtraProperty']list内的遍历数据为：",e)
             extra = ExtraProperty()
-            p_data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timechange(raw['timestamp'])).first()
-            print('绑定数据为',p_data)
+            p_data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
             extra.data = p_data
             extra.devId = e['devId']
             extra.extra_id = e['id']
             extra.name = e['name']
             extra.value = e['value']
-            print('data_id:',raw['id'])
             extra.save()
 
     return JsonResponse({ 'success': True })
