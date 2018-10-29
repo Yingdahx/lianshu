@@ -127,26 +127,16 @@ def station(request):
     ctx = {}
     station_id = request.GET.get('station')
     print(station_id)
-
-    #模拟数据
-    alives = [True,False]
-    now = datetime.datetime.now()
-    nowstr = now.strftime("%Y-%m-%d %H:%M:%S")
-    nowArray = time.strptime(nowstr, "%Y-%m-%d %H:%M:%S")
-    timeStamp1 = int(time.mktime(nowArray))
-
-    time2 = now + datetime.timedelta(days=-1)
-    time2str = time2.strftime("%Y-%m-%d %H:%M:%S")
-    time2Array = time.strptime(time2str,"%Y-%m-%d %H:%M:%S")
-    time2Stamp2 = int(time.mktime(time2Array))
+    station_id = float(station_id)
     
-    ctx['station_id'] = int(float(station_id))    #小压站ID
-    ctx['is_alive'] = alives[random.randint(0,1)] #设备是否在线 
-    ctx['trunk_num'] = random.randint(0,5)        #今天第几箱垃圾                     
-    ctx['spillover'] = random.randint(1,99)       #(当前箱垃圾的满溢度百分比) int (大于0小于100)   [2]
-    ctx['operation_num'] = random.randint(0,20)   #(垃圾翻斗动作了几次) int                     [5]
-    ctx['update_time'] = timeStamp1               #(上次收到数据的时间) int （unix 时间戳）       [18] [24]
-    ctx['online_time'] = time2Stamp2              #(设备上线时间) int （unix 时间戳）            
+    frame = Frame_data.objects.filter(data__data_id=station_id).order_by('-online_time').first()
+    ctx['station_id'] = frame.data.data_id        #小压站ID
+    ctx['is_alive'] = frame.data.alive            #设备是否在线 
+    ctx['trunk_num'] = frame.count                #今天第几箱垃圾                     
+    ctx['spillover'] = frame.manyi                #(当前箱垃圾的满溢度百分比) int (大于0小于100)   [2]
+    ctx['operation_num'] =  frame.action          #(垃圾翻斗动作了几次) int                     [5]
+    ctx['update_time'] = frame.get_time           #(上次收到数据的时间) int （unix 时间戳）       [18] [24]
+    ctx['online_time'] = frame.online_time        #(设备上线时间) int （unix 时间戳）            
 
     return  JsonResponse(ctx,safe=False)
 
