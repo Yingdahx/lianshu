@@ -83,7 +83,7 @@ def push(request):
     if 'gtw_info' in raw.keys() and raw['gtw_info']:
         for r in raw['gtw_info']:
             gtw = Gtw_info()
-            gtw.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = raw['timestamp']).first()
+            gtw.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timechange(raw['timestamp'])).first()
             gtw.gtw_id = r['gtw_id']
             gtw.rssi = r['rssi']
             gtw.snr = r['snr']
@@ -93,7 +93,7 @@ def push(request):
         for e in raw['ExtraProperty']:
             print("raw['ExtraProperty']list内的遍历数据为：",e)
             extra = ExtraProperty()
-            p_data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = raw['timestamp']).first()
+            p_data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timechange(raw['timestamp'])).first()
             print('绑定数据为',p_data)
             extra.data = p_data
             extra.devId = e['devId']
