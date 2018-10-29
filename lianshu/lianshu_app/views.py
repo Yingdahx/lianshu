@@ -28,12 +28,10 @@ def timechange(timestr):
     return new_str
 
 def base64_decode(base64_str):
-    #test
-    #input -> 'VEVxQ0FRQUNBZ0FDQXdBQUVBQkRSZ0FCSUJnUUpoVUNSek1BQUFBQUFBQ1FBQUFBQUFBQUFBPT0=' 
-    #return -> 'TEqCAQACAgACAwAAEABDRgABIBgQJhUCRzMAAAAAAACQAAAAAAAAAA=='
-    enstr = base64.b64decode(base64_str.encode('utf-8'))
-    #报错点
-    return str(enstr,'utf-8')
+    enstr = base64.b64decode(base64_str.encode('utf-8'))  #base64解码 16进制bytes
+    strlist = [ int(hex(x),16) for x in enstr ] 
+    reslist = [   _[2:]    for _ in strlist ]    #去掉头
+    return reslist
 
 
 @csrf_exempt
@@ -56,10 +54,7 @@ def push(request):
     timestr = timechange(raw['timestamp'])
     data.timestamp = timestr
     data.devaddr = raw['devaddr']
-    #没解码就base64解码出来保存 已经解码了就直接保存
-    print('接受数据的decrypted字段：',raw['decrypted'])
-    print("raw['decrypted']:", raw['decrypted'])
-    data.dataFrame = raw['dataFrame'] if raw['decrypted'] else base64_decode(raw['dataFrame'])
+    data.dataFrame = raw['dataFrame']
     data.fcnt = raw['fcnt']
     data.port = raw['port']
     data.rssi = raw['rssi']
@@ -78,8 +73,28 @@ def push(request):
     data.name = raw['name']
     data.longitude = raw['longitude']
     data.latitude = raw['latitude']
+    data.alive = raw['live']
     data.save()
+    print('原数据入库完成')
 
+    #base64解码解析数据
+    fram_list = base64_decode(raw['dataFrame'])
+    frame = Frame_data()
+    frame.data =  Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
+    frame.decode_list = str(fram_list)
+    frame.count = 0   #第几箱垃圾  暂无解析字段
+    frame.manyi = int(fram_list[2])      #第2位 满溢度
+    frame.action = int(fram_list[5])     #第5位 翻斗次数
+    f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),
+        hour=int(fram_list[22]),minute=int(fram_list[23]),second=int(fram_list[24]))
+    d_unix = time.mktime(f_date.timetuple())
+    frame.get_time = int(d_unix)       
+    on_date = time.mktime(timestr.timetuple())
+    frame.online_time = int(on_date)
+    frame.save()
+    print('base64解析入库完成')
+
+    
     if 'gtw_info' in raw.keys() and raw['gtw_info']:
         for r in raw['gtw_info']:
             gtw = Gtw_info()
@@ -123,11 +138,11 @@ def station(request):
     
     ctx['station_id'] = int(float(station_id))    #小压站ID
     ctx['is_alive'] = alives[random.randint(0,1)] #设备是否在线 
-    ctx['trunk_num'] = random.randint(0,5)        #今天第几箱垃圾
-    ctx['spillover'] = random.randint(1,99)       #(当前箱垃圾的满溢度百分比) int (大于0小于100)
-    ctx['operation_num'] = random.randint(0,20)   #(垃圾翻斗动作了几次) int
-    ctx['update_time'] = timeStamp1               #(上次收到数据的时间) int （unix 时间戳）
-    ctx['online_time'] = time2Stamp2              #(设备上线时间) int （unix 时间戳）
+    ctx['trunk_num'] = random.randint(0,5)        #今天第几箱垃圾                     
+    ctx['spillover'] = random.randint(1,99)       #(当前箱垃圾的满溢度百分比) int (大于0小于100)   [2]
+    ctx['operation_num'] = random.randint(0,20)   #(垃圾翻斗动作了几次) int                     [5]
+    ctx['update_time'] = timeStamp1               #(上次收到数据的时间) int （unix 时间戳）       [18] [24]
+    ctx['online_time'] = time2Stamp2              #(设备上线时间) int （unix 时间戳）            
 
     return  JsonResponse(ctx,safe=False)
 

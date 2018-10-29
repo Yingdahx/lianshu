@@ -23,11 +23,13 @@ class Push_data(models.Model):
 	device_redundancy = models.DecimalField(max_digits=5, decimal_places=1,verbose_name = 'device_redundancy')#冗余
 	time_on_air_ms = models.DecimalField(max_digits=10, decimal_places=3,verbose_name = 'time_on_air_ms')
 	decrypted = models.CharField(max_length=200,default='',verbose_name = '是否解密(decrypted)') #
-	status = models.CharField(max_length=200,default='',verbose_name = '是否在线(status)')
+	status = models.CharField(max_length=200,default='',verbose_name = 'status')
 	address = models.CharField(max_length=200,default='',verbose_name = 'address')
 	name = models.CharField(max_length=200,default='',null=True,verbose_name = 'name')
 	longitude = models.DecimalField(max_digits=15,decimal_places=1,verbose_name = 'longitude')
 	latitude = models.DecimalField(max_digits=15,decimal_places=1,verbose_name = 'latitude')
+	alive = models.CharField(max_length=200,default='',verbose_name='是否在线')
+	data_hex = models.CharField(max_length=200,default='',verbose_name='解码处理后的16字节list字符串')
 
 	def __str__(self):
 		return 'ID:' + str(self.data_id) + '     设备的EUI:' + self.deveui + '     数据上报时间' + self.timestamp 
@@ -54,10 +56,24 @@ class ExtraProperty(models.Model):
 	name = models.CharField(max_length=50,default='',verbose_name='name')
 	value = models.CharField(max_length=50,default='',verbose_name='value')
 
-
-
 	def __str__(self):
 		return '绑定数据:' + self.data.devId + 'devId:' + self.devId +'extra_id:' + self.extra_id
+
+class Frame_data(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = '接受数据对应的解码数据'
+
+	data = models.ForeignKey(Push_data,on_delete=models.CASCADE,verbose_name='绑定数据')
+	decode_list = models.CharField(max_length=200,default='',verbose_name='解码字符串list')
+	count = models.IntegerField(default=0,verbose_name='今天第几箱垃圾')
+	manyi =  models.IntegerField(default=0,verbose_name='设备满溢参数')
+	action = models.IntegerField(default=0,verbose_name='垃圾翻斗动作次数')
+	get_time = models.IntegerField(default=0,verbose_name='上次收到数据时间')
+	online_time = models.IntegerField(default=0,verbose_name='设备上线时间')
+
+	def __str__(self):
+		return '小压站:' + self.data.data_id 
+			
 
 class Station(models.Model):
 	class Meta:
