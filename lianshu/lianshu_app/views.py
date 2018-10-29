@@ -85,10 +85,14 @@ def push(request):
     frame.count = 0   #第几箱垃圾  暂无解析字段
     frame.manyi = int(fram_list[2])      #第2位 满溢度
     frame.action = int(fram_list[5])     #第5位 翻斗次数
+    #拼接 生成datetime
     f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),
         hour=int(fram_list[22]),minute=int(fram_list[23]),second=int(fram_list[24]))
+    #转成时间戳 float->int
     d_unix = time.mktime(f_date.timetuple())
-    frame.get_time = int(d_unix)       
+    frame.get_time = int(d_unix)   
+    #str -> datetime -> float -> int 
+    timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
     on_date = time.mktime(timestr.timetuple())
     frame.online_time = int(on_date)
     frame.save()
