@@ -2,7 +2,7 @@ from django.db import models
 
 class Push_data(models.Model):
 	class Meta:
-		verbose_name = verbose_name_plural = '接收数据'
+		verbose_name = verbose_name_plural = '接收数据(原数据)'
 
 	#DecimalField类型max_digits-总位数，decimal_places-小数点后精确位数
 	data_id = models.DecimalField(max_digits=20,decimal_places=1,verbose_name='ID')
@@ -61,11 +61,11 @@ class ExtraProperty(models.Model):
 
 class Frame_data(models.Model):
 	class Meta:
-		verbose_name = verbose_name_plural = '接受数据对应的解码数据'
+		verbose_name = verbose_name_plural = 'base64解析数据'
 
 	data = models.ForeignKey(Push_data,on_delete=models.CASCADE,verbose_name='绑定数据')
 	decode_list = models.CharField(max_length=500,default='',verbose_name='解码字符串list')
-	count = models.IntegerField(default=0,verbose_name='今天第几箱垃圾')
+	count = models.IntegerField(default=0,verbose_name='今天第几箱垃圾(暂时默认为0)')
 	manyi =  models.IntegerField(default=0,verbose_name='设备满溢参数')
 	action = models.IntegerField(default=0,verbose_name='垃圾翻斗动作次数')
 	get_time = models.IntegerField(default=0,verbose_name='上次收到数据时间')
