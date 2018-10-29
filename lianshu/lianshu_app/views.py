@@ -50,6 +50,7 @@ def push(request):
     data.devaddr = raw['devaddr']
     #没解码就base64解码出来保存 已经解码了就直接保存
     print('接受数据的decrypted字段：',raw['decrypted'])
+    print("raw['decrypted'] == 'True':",raw['decrypted'] == 'True')
     data.dataFrame = raw['dataFrame'] if raw['decrypted'] == 'True' else base64_decode(raw['dataFrame'])
     data.fcnt = raw['fcnt']
     data.port = raw['port']
