@@ -81,23 +81,23 @@ def push(request):
 
 
     if 'gtw_info' in raw.keys() and raw['gtw_info']:
-    	for r in raw['gtw_info']:
-    		gtw = Gtw_info()
-    		gtw.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = raw['timestamp']).first()
-    		gtw.gtw_id = r['gtw_id']
-    		gtw.rssi = r['rssi']
-    		gtw.snr = r['snr']
-    		gtw.save()
+        for r in raw['gtw_info']:
+            gtw = Gtw_info()
+            gtw.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = raw['timestamp']).first()
+            gtw.gtw_id = r['gtw_id']
+            gtw.rssi = r['rssi']
+            gtw.snr = r['snr']
+            gtw.save()
 
     if 'ExtraProperty' in raw.keys() and raw['ExtraProperty']:
-    	for e in raw['ExtraProperty']:
-    		extra = ExtraProperty()
-    		extra.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = raw['timestamp']).first()
+        for e in raw['ExtraProperty']:
+            extra = ExtraProperty()
+            extra.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = raw['timestamp']).first()
             extra.devId = e.devId
             extra.extra_id = e.id
             extra.name = e.name
             extra.value = e.value
-    		extra.save()
+            extra.save()
 
     return JsonResponse({ 'success': True })
 
