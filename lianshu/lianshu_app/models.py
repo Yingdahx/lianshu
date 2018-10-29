@@ -64,7 +64,7 @@ class Frame_data(models.Model):
 		verbose_name = verbose_name_plural = '接受数据对应的解码数据'
 
 	data = models.ForeignKey(Push_data,on_delete=models.CASCADE,verbose_name='绑定数据')
-	decode_list = models.CharField(max_length=200,default='',verbose_name='解码字符串list')
+	decode_list = models.CharField(max_length=500,default='',verbose_name='解码字符串list')
 	count = models.IntegerField(default=0,verbose_name='今天第几箱垃圾')
 	manyi =  models.IntegerField(default=0,verbose_name='设备满溢参数')
 	action = models.IntegerField(default=0,verbose_name='垃圾翻斗动作次数')
