@@ -42,7 +42,7 @@ class Gtw_info(models.Model):
 	snr = models.DecimalField(max_digits=5,decimal_places=1,verbose_name = 'snr')
 
 	def __str__(self):
-		return 'gtw_id:' + self.gtw_id + '     绑定数据:' + str(self.data.data_id)
+		return 'gtw_id:' + self.gtw_id + '     绑定数据:' + str(self.data)
  
 class ExtraProperty(models.Model):
 	class Meta:
