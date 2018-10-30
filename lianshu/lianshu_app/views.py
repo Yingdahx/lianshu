@@ -164,10 +164,19 @@ def push_station(request):
 @csrf_exempt
 def test(request):
     #需求3：定时任务测试 每15分钟推送一次数据到指定url接口上
-    now = datetime.datetime.now()
+    now = datetime.datetime.now() #datetime
     print('-----begin-----')
     print(now)
-    nowstr = now.strftime("%Y-%m-%d %H:%M:%S")
+    
+    now_tuple = int(time.mktime(now.timetuple()))     #datetime->时间戳
+    last_tuple = now_tuple - 900    #15分钟前的时间戳    
+    # last_date = time.localtime(last_tuple)                      #时间戳->datetime
+    # last_str = time.strftime("%Y-%m-%d %H:%M:%S", last_date)    #datetime->字符串
+    # nowstr = now.strftime("%Y-%m-%d %H:%M:%S")                  #datetime->字符串
+    #比对 nowstr 及 last_str 即可
+
+
+
     headers = {
         "Content-Type": "application/json; charset=UTF-8",
         }
