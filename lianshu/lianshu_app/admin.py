@@ -14,7 +14,7 @@ class Push_dataAdmin(admin.ModelAdmin):
     	'name','longitude','latitude')
 
 class Frame_dataAdmin(admin.ModelAdmin):
-    list_display = ('data','decode_list','count','manyi','action','get_time','online_time')
+    list_display = ('data','decode_list','sta_id','status','count','manyi','action','get_time','online_time')
 
 
 admin.site.register(Push_data,Push_dataAdmin)

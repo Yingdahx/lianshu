@@ -95,6 +95,8 @@ def push(request):
     timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
     on_date = time.mktime(timestr.timetuple())
     frame.online_time = int(on_date)
+    frame.sta_id = fram_list[0] +  fram_list[1]
+    frame.status = int(fram_list[13])
     frame.save()
     print('base64解析入库完成')
 
@@ -163,7 +165,12 @@ def push_station(request):
 
 @csrf_exempt
 def test(request):
-    #需求3：定时任务测试 每15分钟推送一次数据到指定url接口上
+    #需求3：定时任务测试 每15分钟推送一次数据到指定url接口上 测试接口
+    headers = {
+        "Content-Type": "application/json; charset=UTF-8",
+        }
+    url = "http://101.89.135.132/compressionstation/spillover/add/"
+
     now = datetime.datetime.now() #datetime
     print('-----begin-----')
     print(now)
@@ -173,32 +180,30 @@ def test(request):
     # last_date = time.localtime(last_tuple)                      #时间戳->datetime
     # last_str = time.strftime("%Y-%m-%d %H:%M:%S", last_date)    #datetime->字符串
     # nowstr = now.strftime("%Y-%m-%d %H:%M:%S")                  #datetime->字符串
-    #比对 nowstr 及 last_str 即可
-
-
-
-    headers = {
-        "Content-Type": "application/json; charset=UTF-8",
-        }
-    url = "http://101.89.135.132/compressionstation/spillover/add/"
-
-    pyload = {}
-    pyload['station'] = 'test'
-    pyload['spillover'] = '80'
-    pyload['sensors'] = sensors = []
-    while len(sensors) < 3:
-        sensor = {}
-        sensor['type'] = len(sensors)
-        sensor['status'] = '0'
-        sensor['rawdata'] = '00' + str(len(sensors)+1)
-        sensor['datatime'] = nowstr
-        sensors.append(sensor)
+    # 比对 nowstr 及 last_str 即可
+    res = []
+    stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple)).values_list('sta_id','manyi').distinct()
+    stas = list(stas)
+    for sta in stas:
+        pyload = {}
+        pyload['station'] = sta[0]
+        pyload['spillover'] = sta[1]
+        pyload['sensors'] = sensors = []
+        datas = Frame_data.objects.filter(sta_id=sta[0],online_time__range=(last_tuple,now_tuple)).order_by('-online_time')
+        for _ in datas:
+            sensor = {}
+            sensor['type'] = 0 #暂时默认置0
+            sensor['status'] = _.status
+            sensor['rawdata'] = _.data.dataFrame
+            sensor['datatime'] = _.data.timestamp
+            sensors.append(sensor)
+        res.append(pyload)
     print('-----post data-----')
-    print(json.dumps(pyload))
-    response = requests.post(url, data=json.dumps(pyload), headers=headers).text
-    print('------post response-----')
-    print(response)
-    return JsonResponse({ 'msg': 'success' })
+    # print(json.dumps(pyload))
+    # response = requests.post(url, data=json.dumps(pyload), headers=headers).text
+    # print('------post response-----')
+    # print(response)
+    return res
 
 # post data :
 # {  

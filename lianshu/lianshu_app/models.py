@@ -65,14 +65,16 @@ class Frame_data(models.Model):
 
 	data = models.ForeignKey(Push_data,on_delete=models.CASCADE,verbose_name='绑定数据')
 	decode_list = models.CharField(max_length=500,default='',verbose_name='解码字符串list')
+	sta_id = models.CharField(max_length=20,default='',verbose_name='设备标识')
 	count = models.IntegerField(default=0,verbose_name='今天第几箱垃圾(暂时默认为0)')
 	manyi =  models.IntegerField(default=0,verbose_name='设备满溢参数')
 	action = models.IntegerField(default=0,verbose_name='垃圾翻斗动作次数')
+	status = models.IntegerField(default=0,verbose_name='状态')
 	get_time = models.IntegerField(default=0,verbose_name='上次收到数据时间')
 	online_time = models.IntegerField(default=0,verbose_name='设备上线时间')
 
 	def __str__(self):
-		return '小压站:' + str(self.data.data_id)
+		return '小压站:' + str(self.data.data_id) +'设备标识'+self.sta_id+'解析字符串' + self.decode_list
 			
 
 class Station(models.Model):
