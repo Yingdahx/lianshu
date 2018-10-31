@@ -82,7 +82,7 @@ def push(request):
     frame.data =  Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
     frame.decode_list = str(fram_list)
     frame.count = 0                              #第几箱垃圾  暂无解析字段
-    frame.manyi = int(fram_list[2])              #第2位 满溢度 
+    frame.manyi = int(fram_list[2])                 #第2位 满溢度 
     frame.action = int('0x'+fram_list[5],16)     #第5位 翻斗次数 转回十进制
     #拼接 生成datetime
     f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),
@@ -175,8 +175,8 @@ def test(request):
     print('-----begin-----')
     print(now)
     
-    now_tuple = int(time.mktime(now.timetuple()))     #datetime->时间戳
-    last_tuple = now_tuple - 900    #15分钟前的时间戳    
+    now_tuple = int(time.mktime(now.timetuple()))                 #datetime->时间戳
+    last_tuple = now_tuple - 900                                  #15分钟前的时间戳    
     # last_date = time.localtime(last_tuple)                      #时间戳->datetime
     # last_str = time.strftime("%Y-%m-%d %H:%M:%S", last_date)    #datetime->字符串
     # nowstr = now.strftime("%Y-%m-%d %H:%M:%S")                  #datetime->字符串
