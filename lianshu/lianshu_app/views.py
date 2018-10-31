@@ -85,7 +85,7 @@ def push(request):
     frame.decode_list = str(fram_list)
     frame.count = 0   #第几箱垃圾  暂无解析字段
     frame.manyi = int(fram_list[2])      #第2位 满溢度 
-    frame.action = int(fram_list[5])     #第5位 翻斗次数
+    frame.action = int('0x'+fram_list[5],16)     #第5位 翻斗次数 转回十进制
     #拼接 生成datetime
     f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),
         hour=int(fram_list[22]),minute=int(fram_list[23]),second=int(fram_list[24]))
