@@ -45,7 +45,7 @@ def push(request):
     # json_root = settings.MEDIA_ROOT  + '%d.json' % time.time()  #json保存路径
     # with open(json_root, 'w') as f:
     #   f.write(json.dumps(raw))
-    print('推送数据：',raw)
+    print('推送数据：',raw,sep='\n')
 
     data = Push_data()
     data.data_id = raw['id']
@@ -79,7 +79,7 @@ def push(request):
 
     #base64解码解析数据
     fram_list = base64_decode(raw['dataFrame'])
-    print('解码后的字节码：',fram_list)
+    print('解码后的字节码：',fram_list,sep='\n')
     frame = Frame_data()
     frame.data =  Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
     frame.decode_list = str(fram_list)
@@ -99,8 +99,8 @@ def push(request):
     frame.sta_id = fram_list[0] +  fram_list[1]
     frame.status = int(fram_list[13])
     frame.save()
-    print('base64解析入库完成')
-
+    print('转码后入库的信息:','满溢度',int(fram_list[2]),'翻斗次数',int('0x'+fram_list[5],16),
+        '设备标识',fram_list[0] +  fram_list[1],'状态',int(fram_list[13]),'base64解析入库完成'sep='\n')
 
     if 'gtw_info' in raw.keys() and raw['gtw_info']:
         for r in raw['gtw_info']:
