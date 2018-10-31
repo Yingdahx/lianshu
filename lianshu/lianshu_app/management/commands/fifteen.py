@@ -5,6 +5,7 @@ from django.db.models import Model
 from django.utils.timezone import now, timedelta
 import datetime
 import time
+import json
 
 
 class Command(BaseCommand):
@@ -15,7 +16,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         now = datetime.datetime.now() #datetime
         print('-----post begin-----')
-        print(now)
+        print('-----post time:',now,'-----')
         now_tuple = int(time.mktime(now.timetuple()))                 #datetime->时间戳
         last_tuple = now_tuple - 900                                  #15分钟前的时间戳   
 
@@ -44,7 +45,8 @@ class Command(BaseCommand):
                 sensors.append(sensor)
             res.append(pyload)
 
-        print('-----post data-----',resp)
+        print('-----post data-----')
+        print('-----post station:',len(res))
         try :
             response = requests.post(url, data=json.dumps(resp), headers=headers).text
             print('-----post success-----',response)
