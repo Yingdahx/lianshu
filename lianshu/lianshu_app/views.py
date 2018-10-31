@@ -9,6 +9,7 @@ import random
 import requests
 import time,datetime
 import base64
+import logging
 
 #格林威治时间转换
 def timechange(timestr):
@@ -232,6 +233,17 @@ def test(request):
 #     ]  
 # }
 
+@csrf_exempt
+def log_test(request):
+    logger = logging.getLogger("15") # django为loggers中定义的名称
+
+    try:
+        a = []
+        b = a[1]
+    except Exception as e:
+        logger.error(e)
+
+    return HttpRequest('test end')
 
 
 

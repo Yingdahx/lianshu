@@ -24,5 +24,6 @@ urlpatterns = [
     path('push_station/',views.push_station),
     url(r'^station$',views.station), 
     path('test/',views.test),
+    path('log_test/',views.log_test),
 
 ]

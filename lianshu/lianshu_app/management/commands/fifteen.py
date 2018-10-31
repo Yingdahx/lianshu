@@ -6,6 +6,7 @@ from django.utils.timezone import now, timedelta
 import datetime
 import time
 import json
+import logging
 
 
 class Command(BaseCommand):
@@ -14,9 +15,11 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         pass
     def handle(self, *args, **options):
+        #日志记录器
+        logger = logging.getLogger('15')
         now = datetime.datetime.now() #datetime
-        print('-----post begin-----')
-        print('-----post time:',now,'-----')
+        logger.info('-----post begin-----')
+        logger.info('-----'+str(now)+'-----')
         now_tuple = int(time.mktime(now.timetuple()))                 #datetime->时间戳
         last_tuple = now_tuple - 900                                  #15分钟前的时间戳   
 
@@ -45,12 +48,12 @@ class Command(BaseCommand):
                 sensors.append(sensor)
             res.append(pyload)
 
-        print('-----post data-----')
-        print('-----post station:',len(res))
+        logger.debug('-----post data-----')
+        logger.debug('-----post station:'+str(len(res)))
         try :
             response = requests.post(url, data=json.dumps(resp), headers=headers).text
-            print('-----post success-----',response)
-        except:
-            response = requests.post(url, data=json.dumps(resp), headers=headers)
-            print('-----post failed-----',response)
+            print('-----post success-----'+response)
+        except Exception as e:
+            logger.error('-----post failed-----')
+            logger.error(e)
         
