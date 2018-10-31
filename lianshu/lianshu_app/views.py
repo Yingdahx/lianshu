@@ -10,7 +10,6 @@ import requests
 import time,datetime
 import base64
 
-
 #格林威治时间转换
 def timechange(timestr):
     #'2018-10-26T06:25:04.845Z'
@@ -30,9 +29,8 @@ def timechange(timestr):
 def base64_decode(base64_str):
     enstr = base64.b64decode(base64_str.encode('utf-8'))  #base64解码 16进制bytes
     strlist = [ hex(x) for x in enstr ] 
-    reslist = [   _[2:]    for _ in strlist ]    #去掉头
+    reslist = [ _[2:] for _ in strlist ]    #去掉头
     return reslist
-
 
 @csrf_exempt
 def push(request):
@@ -46,12 +44,12 @@ def push(request):
     # with open(json_root, 'w') as f:
     #   f.write(json.dumps(raw))
     print('推送数据：',raw,sep='\n')
+    #格林威治时间转为北京时区时间字串
+    timestr = timechange(raw['timestamp'])
 
     data = Push_data()
     data.data_id = raw['id']
     data.deveui = raw['deveui']
-    #格林威治时间转为北京时区时间字串
-    timestr = timechange(raw['timestamp'])
     data.timestamp = timestr
     data.devaddr = raw['devaddr']
     data.dataFrame = raw['dataFrame']
@@ -83,15 +81,15 @@ def push(request):
     frame = Frame_data()
     frame.data =  Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
     frame.decode_list = str(fram_list)
-    frame.count = 0   #第几箱垃圾  暂无解析字段
-    frame.manyi = int(fram_list[2])      #第2位 满溢度 
+    frame.count = 0                              #第几箱垃圾  暂无解析字段
+    frame.manyi = int(fram_list[2])              #第2位 满溢度 
     frame.action = int('0x'+fram_list[5],16)     #第5位 翻斗次数 转回十进制
     #拼接 生成datetime
     f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),
         hour=int(fram_list[22]),minute=int(fram_list[23]),second=int(fram_list[24]))
-    #转成时间戳 float->int
+    #转成时间戳 float -> int
     d_unix = time.mktime(f_date.timetuple())
-    frame.get_time = int(d_unix)   
+    frame.get_time = int(d_unix)
     #str -> datetime -> float -> int 
     timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
     on_date = time.mktime(timestr.timetuple())
@@ -103,6 +101,7 @@ def push(request):
         '设备标识',fram_list[0] +  fram_list[1],'状态',int(fram_list[13]),'base64解析入库完成',sep='\n')
 
     if 'gtw_info' in raw.keys() and raw['gtw_info']:
+        print('gtw_info数据',raw['gtw_info'],sep='\n')
         for r in raw['gtw_info']:
             gtw = Gtw_info()
             gtw.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
@@ -112,6 +111,7 @@ def push(request):
             gtw.save()
 
     if 'ExtraProperty' in raw.keys() and raw['ExtraProperty']:
+        print('ExtraProperty数据',raw['ExtraProperty'],sep='\n')
         for e in raw['ExtraProperty']:
             extra = ExtraProperty()
             p_data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
@@ -133,7 +133,7 @@ def station(request):
     station_id = float(station_id)
     
     frame = Frame_data.objects.filter(data__data_id=station_id).order_by('-online_time').first()
-    ctx['station_id'] = float(frame.data.data_id)          #小压站ID
+    ctx['station_id'] = float(frame.data.data_id)    #小压站ID
     ctx['is_alive'] = frame.data.alive == str(True)  #设备是否在线 
     ctx['trunk_num'] = frame.count                   #今天第几箱垃圾                     
     ctx['spillover'] = frame.manyi                   #(当前箱垃圾的满溢度百分比) int (大于0小于100)   [2]
@@ -142,7 +142,6 @@ def station(request):
     ctx['online_time'] = frame.online_time           #(设备上线时间) int （unix 时间戳）            
 
     return  JsonResponse(ctx,safe=False)
-
 
 @csrf_exempt
 def push_station(request):
@@ -209,26 +208,28 @@ def test(request):
 
 # post data :
 # {  
-#   "station": "xxx", 站标识（小站垃圾压缩设备无线监控系统提供相关小站检测数据上传到应用方数据系统）
-#   "spillover": "80", 满溢度，百分比
-#   "sensors": [{ 传感器列表
-#     "type": "0", 传感器类别（取值0~2，目前确定为3个传感器）
-#     "status": "0", 正常，"1",非正常
-#     "rawdata": "001", 数据采集的原始数据
-#     "datatime": "2018-04-18 13: 01: 01" 数据采集的时间
-#   }, { 
-#     "type": "1", 传感器类别（取值0~2，目前确定为3个传感器）
-#     "status": "0", 正常，"1",非正常
-#     "rawdata": "002", 数据采集的原始数据
-#     "datatime": "2018-04-18 13: 01: 01" 数据采集的时间
-#   }, 
-#  { 
-#     "type": "2", 传感器类别（取值0~2，目前确定为3个传感器）
-#     "status": "0", 正常，"1",非正常
-#     "rawdata": "003", 数据采集的原始数据
-#     "datatime": "2018-04-18 13: 01: 01" 数据采集的时间
-#   }, 
-# ]  
+#     "station": "xxx", 站标识（小站垃圾压缩设备无线监控系统提供相关小站检测数据上传到应用方数据系统）
+#     "spillover": "80", 满溢度，百分比
+#     "sensors": [       传感器列表
+#         { 
+#             "type": "0", 传感器类别（取值0~2，目前确定为3个传感器）
+#             "status": "0", 正常，"1",非正常
+#             "rawdata": "001", 数据采集的原始数据
+#             "datatime": "2018-04-18 13: 01: 01" 数据采集的时间
+#         }, 
+#         { 
+#             "type": "1", 传感器类别（取值0~2，目前确定为3个传感器）
+#             "status": "0", 正常，"1",非正常
+#             "rawdata": "002", 数据采集的原始数据
+#             "datatime": "2018-04-18 13: 01: 01" 数据采集的时间
+#         }, 
+#         { 
+#             "type": "2", 传感器类别（取值0~2，目前确定为3个传感器）
+#             "status": "0", 正常，"1",非正常
+#             "rawdata": "003", 数据采集的原始数据
+#             "datatime": "2018-04-18 13: 01: 01" 数据采集的时间
+#         }, 
+#     ]  
 # }
 
 
