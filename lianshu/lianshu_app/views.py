@@ -205,7 +205,7 @@ def test(request):
     # response = requests.post(url, data=json.dumps(pyload), headers=headers).text
     # print('------post response-----')
     # print(response)
-    return resp
+    return JsonResponse(resp,safe=False)
 
 # post data :
 # {  
