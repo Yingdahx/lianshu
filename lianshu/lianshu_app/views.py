@@ -182,7 +182,8 @@ def test(request):
     # last_str = time.strftime("%Y-%m-%d %H:%M:%S", last_date)    #datetime->字符串
     # nowstr = now.strftime("%Y-%m-%d %H:%M:%S")                  #datetime->字符串
     # 比对 nowstr 及 last_str 即可
-    res = []
+    resp = {}
+    resp['res']= res = []
     stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple)).values_list('sta_id','manyi').distinct()
     stas = list(stas)
     for sta in stas:
@@ -204,7 +205,7 @@ def test(request):
     # response = requests.post(url, data=json.dumps(pyload), headers=headers).text
     # print('------post response-----')
     # print(response)
-    return res
+    return resp
 
 # post data :
 # {  
