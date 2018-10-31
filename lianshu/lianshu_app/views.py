@@ -79,11 +79,12 @@ def push(request):
 
     #base64解码解析数据
     fram_list = base64_decode(raw['dataFrame'])
+    print('解码后的字节码：',fram_list)
     frame = Frame_data()
     frame.data =  Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
     frame.decode_list = str(fram_list)
     frame.count = 0   #第几箱垃圾  暂无解析字段
-    frame.manyi = int(fram_list[2])      #第2位 满溢度
+    frame.manyi = int(fram_list[2])      #第2位 满溢度 
     frame.action = int(fram_list[5])     #第5位 翻斗次数
     #拼接 生成datetime
     f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),
