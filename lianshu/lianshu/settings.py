@@ -121,56 +121,56 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-LOGGING_URL = '/log/'
+# LOGGING_URL = '/log/'
 
-#logger
-LOGGING = { 
-    'version': 1, #指明dictConnfig的版本，目前就只有一个版本
-    'disable_existing_loggers': False,  #是否禁用所有的已经存在的日志配置
-    'formatters': { #格式器
-        'verbose': { #详细的格式器
-            # 时间  日志等级  路径  文件名 模块 函数名 报错行
-            'format': '%(levelname)s %(asctime)s %(pathname)s %(filename)s %(module)s %(funcName)s %(lineno)d %(message)s' 
-            }, 
-        'simple': {    #自定义的格式器 仅有日志等级 消息内容
-            'format': '%(levelname)s %(message)s'
-            },
-        }, 
-        'handlers': { #处理器，
-            'console':{  #流处理器，所有的高于（包括）debug的消息会被传到stderr，
-                'level':'INFO', 
-                'class':'logging.StreamHandler', 
-                'formatter': 'verbose' #使用的是verbose格式器  可选择自定义的'simple'
-                }, 
-            'file': {    #文件处理器
-                'level': 'INFO', 
-                'class': 'logging.FileHandler', 
-                'filename':  os.path.join(BASE_DIR+LOGGING_URL, "test.log"),  #相对路径 BASE_DIR为manage.py的路径
-                'formatter': 'verbose' 
-                }, 
-            'email': {   #邮件处理器
-                'level': 'ERROR', 
-                'class': 'django.utils.log.AdminEmailHandler', 
-                'include_html' : True, 
-                },
-            'logfile': {    #文件处理器
-                'level': 'INFO', 
-                'class': 'logging.FileHandler', 
-                'filename':  os.path.join(BASE_DIR+LOGGING_URL, "15.log"),  #相对路径 BASE_DIR为manage.py的路径
-                'formatter': 'simple' 
-                }, 
-            }, 
-        'loggers': { #记录器
-            'django': {  #记录器的名字
-                'handlers': ['console', 'file', 'email'], 
-                'level': 'INFO', 
-                'propagate': True, 
-                },
-            '15':{
-                'handlers': ['logfile'], 
-                'level': 'INFO', 
-                'propagate': True, 
-                }
-            },
-        }
+# #logger
+# LOGGING = { 
+#     'version': 1, #指明dictConnfig的版本，目前就只有一个版本
+#     'disable_existing_loggers': False,  #是否禁用所有的已经存在的日志配置
+#     'formatters': { #格式器
+#         'verbose': { #详细的格式器
+#             # 时间  日志等级  路径  文件名 模块 函数名 报错行
+#             'format': '%(levelname)s %(asctime)s %(pathname)s %(filename)s %(module)s %(funcName)s %(lineno)d %(message)s' 
+#             }, 
+#         'simple': {    #自定义的格式器 仅有日志等级 消息内容
+#             'format': '%(levelname)s %(message)s'
+#             },
+#         }, 
+#         'handlers': { #处理器，
+#             'console':{  #流处理器，所有的高于（包括）debug的消息会被传到stderr，
+#                 'level':'INFO', 
+#                 'class':'logging.StreamHandler', 
+#                 'formatter': 'verbose' #使用的是verbose格式器  可选择自定义的'simple'
+#                 }, 
+#             'file': {    #文件处理器
+#                 'level': 'INFO', 
+#                 'class': 'logging.FileHandler', 
+#                 'filename':  os.path.join(BASE_DIR+LOGGING_URL, "test.log"),  #相对路径 BASE_DIR为manage.py的路径
+#                 'formatter': 'verbose' 
+#                 }, 
+#             'email': {   #邮件处理器
+#                 'level': 'ERROR', 
+#                 'class': 'django.utils.log.AdminEmailHandler', 
+#                 'include_html' : True, 
+#                 },
+#             'logfile': {    #文件处理器
+#                 'level': 'INFO', 
+#                 'class': 'logging.FileHandler', 
+#                 'filename':  os.path.join(BASE_DIR+LOGGING_URL, "15.log"),  #相对路径 BASE_DIR为manage.py的路径
+#                 'formatter': 'simple' 
+#                 }, 
+#             }, 
+#         'loggers': { #记录器
+#             'django': {  #记录器的名字
+#                 'handlers': ['console', 'file', 'email'], 
+#                 'level': 'INFO', 
+#                 'propagate': True, 
+#                 },
+#             '15':{
+#                 'handlers': ['logfile'], 
+#                 'level': 'INFO', 
+#                 'propagate': True, 
+#                 }
+#             },
+#         }
 

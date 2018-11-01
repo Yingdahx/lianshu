@@ -16,10 +16,12 @@ class Command(BaseCommand):
         pass
     def handle(self, *args, **options):
         #日志记录器
-        logger = logging.getLogger('15')
+        # logger = logging.getLogger('15')
         now = datetime.datetime.now() #datetime
-        logger.info('-----post begin-----')
-        logger.info('-----'+str(now)+'-----')
+        print('-----post begin-----')
+        print('-----'+str(now)+'-----')
+        # logger.info('-----post begin-----')
+        # logger.info('-----'+str(now)+'-----')
         now_tuple = int(time.mktime(now.timetuple()))                 #datetime->时间戳
         last_tuple = now_tuple - 900                                  #15分钟前的时间戳   
 
@@ -47,13 +49,20 @@ class Command(BaseCommand):
                 sensor['datatime'] = _.data.timestamp
                 sensors.append(sensor)
             res.append(pyload)
+        print('-----post data-----')
+        print('-----post station:'+str(len(res))+'-----')
 
-        logger.debug('-----post data-----')
-        logger.debug('-----post station:'+str(len(res)))
+        # logger.debug('-----post data-----')
+        # logger.debug('-----post station:'+str(len(res)))
         try :
             response = requests.post(url, data=json.dumps(resp), headers=headers).text
             print('-----post success-----'+response)
         except Exception as e:
-            logger.error('-----post failed-----')
-            logger.error(e)
+            print('-----post failed-----')
+            print('-----error-----')
+            print(e)
+            print('----------')
+
+            # logger.error('-----post failed-----')
+            # logger.error(e)
         

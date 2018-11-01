@@ -235,15 +235,19 @@ def test(request):
 
 @csrf_exempt
 def log_test(request):
-    logger = logging.getLogger("15") # django为loggers中定义的名称
+    # logger = logging.getLogger("15") # django为loggers中定义的名称
 
     try:
         a = []
         b = a[1]
     except Exception as e:
-        logger.error(e)
+        # logger.error(e) #此处捕获异常到15.log中去 
+        print(e)
+        #DEBUG，INFO，WARNING，ERROR，CRITICAL
 
-    return HttpRequest('test end')
+    #此处故意报错 15.log中并无该报错项记录，配置的test.log中有该行的报错记录
+    # return HttpRequest('test end') 
+    return HttpResponse('test')
 
 
 
