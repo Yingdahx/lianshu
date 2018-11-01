@@ -21,7 +21,7 @@ class ExtraPropertyAdmin(admin.ModelAdmin):
 
 admin.site.register(Push_data,Push_dataAdmin)
 admin.site.register(Gtw_info)
-admin.site.register(ExtraProperty)
+admin.site.register(ExtraProperty,ExtraPropertyAdmin)
 admin.site.register(Station)
 admin.site.register(Sensor)
 admin.site.register(Frame_data,Frame_dataAdmin)
