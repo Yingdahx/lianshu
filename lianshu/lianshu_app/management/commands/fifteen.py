@@ -18,10 +18,10 @@ class Command(BaseCommand):
         #日志记录器
         # logger = logging.getLogger('15')
         now = datetime.datetime.now() #datetime
-        print('-----post begin-----')
         print('-----'+str(now)+'-----')
-        # logger.info('-----post begin-----')
+        print('-----post begin-----')
         # logger.info('-----'+str(now)+'-----')
+        # logger.info('-----post begin-----')
         now_tuple = int(time.mktime(now.timetuple()))                 #datetime->时间戳
         last_tuple = now_tuple - 900                                  #15分钟前的时间戳   
 
