@@ -242,7 +242,7 @@ def log_test(request):
         b = a[1]
     except Exception as e:
         # logger.error(e) #此处捕获异常到15.log中去 
-        print(e)
+        print('-----Exception-----',e,'-------------------',sep='\n')
         #DEBUG，INFO，WARNING，ERROR，CRITICAL
 
     #此处故意报错 15.log中并无该报错项记录，配置的test.log中有该行的报错记录

@@ -69,7 +69,7 @@ class Frame_data(models.Model):
 	count = models.IntegerField(default=0,verbose_name='今天第几箱垃圾(暂时默认为0)')
 	manyi =  models.IntegerField(default=0,verbose_name='设备满溢参数')
 	action = models.IntegerField(default=0,verbose_name='垃圾翻斗动作次数')
-	status = models.IntegerField(default=0,verbose_name='状态')
+	status = models.IntegerField(default=0,verbose_name='是否在线')
 	get_time = models.IntegerField(default=0,verbose_name='上次收到数据时间')
 	online_time = models.IntegerField(default=0,verbose_name='设备上线时间')
 
