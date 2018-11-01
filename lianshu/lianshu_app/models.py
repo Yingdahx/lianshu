@@ -66,7 +66,7 @@ class Frame_data(models.Model):
 	data = models.ForeignKey(Push_data,on_delete=models.CASCADE,verbose_name='绑定数据')
 	decode_list = models.CharField(max_length=500,default='',verbose_name='解码字符串list')
 	sta_id = models.CharField(max_length=20,default='',verbose_name='设备标识')
-	count = models.IntegerField(default=0,verbose_name='今天第几箱垃圾(暂时默认为0)')
+	count = models.IntegerField(default=0,verbose_name='今天第几箱垃圾(暂时默认为1)')
 	manyi =  models.IntegerField(default=0,verbose_name='设备满溢参数')
 	action = models.IntegerField(default=0,verbose_name='垃圾翻斗动作次数')
 	status = models.IntegerField(default=0,verbose_name='是否在线')

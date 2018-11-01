@@ -33,24 +33,32 @@ class Command(BaseCommand):
         #推送时间段内的数据
         resp = {}
         resp['res']= res = []
-        stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple)).values_list('sta_id','manyi').distinct()
+        stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple)).values_list('sta_id').distinct()
         stas = list(stas)
+        print(stas)
         for sta in stas:
-            pyload = {}
-            pyload['station'] = sta[0]
-            pyload['spillover'] = sta[1]
-            pyload['sensors'] = sensors = []
             datas = Frame_data.objects.filter(sta_id=sta[0],online_time__range=(last_tuple,now_tuple)).order_by('-online_time')
+            i = 1
+            pyload = {}
+            pyload['sensors'] = sensors = []
             for _ in datas:
+                if i:
+                    pyload['station'] = _.sta_id
+                    pyload['spillover'] = _.manyi
+                    pyload['trunkNum'] = _.count
+                    pyload['operationNum'] = _.action
+                    pyload['refreshTime'] = _.get_time
+                    pyload['onlineTime'] = _.online_time
+                    i = 0
                 sensor = {}
-                sensor['type'] = 0 #暂时默认置0
-                sensor['status'] = _.status
+                sensor['type'] = '0' #暂时默认置0
+                sensor['status'] = str(_.status)
                 sensor['rawdata'] = _.data.dataFrame
                 sensor['datatime'] = _.data.timestamp
                 sensors.append(sensor)
             res.append(pyload)
         print('-----post data-----')
-        print('-----post station:'+str(len(res))+'-----')
+        print('-----post station num :'+str(len(res))+'-----')
 
         # logger.debug('-----post data-----')
         # logger.debug('-----post station:'+str(len(res)))

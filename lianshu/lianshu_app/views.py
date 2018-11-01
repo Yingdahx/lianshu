@@ -82,7 +82,7 @@ def push(request):
     frame = Frame_data()
     frame.data =  Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
     frame.decode_list = str(fram_list)
-    frame.count = 0                              #第几箱垃圾  暂无解析字段
+    frame.count = 1                              #第几箱垃圾  暂无解析字段
     frame.manyi = int(fram_list[2])                 #第2位 满溢度 
     frame.action = int('0x'+fram_list[5],16)     #第5位 翻斗次数 转回十进制
     #拼接 生成datetime
@@ -184,18 +184,26 @@ def test(request):
     # 比对 nowstr 及 last_str 即可
     resp = {}
     resp['res']= res = []
-    stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple)).values_list('sta_id','manyi').distinct()
+    stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple)).values_list('sta_id').distinct()
     stas = list(stas)
+    print(stas)
     for sta in stas:
-        pyload = {}
-        pyload['station'] = sta[0]
-        pyload['spillover'] = sta[1]
-        pyload['sensors'] = sensors = []
         datas = Frame_data.objects.filter(sta_id=sta[0],online_time__range=(last_tuple,now_tuple)).order_by('-online_time')
+        i = 1
+        pyload = {}
+        pyload['sensors'] = sensors = []
         for _ in datas:
+            if i:
+                pyload['station'] = _.sta_id
+                pyload['spillover'] = _.manyi
+                pyload['trunkNum'] = _.count
+                pyload['operationNum'] = _.action
+                pyload['refreshTime'] = _.get_time
+                pyload['onlineTime'] = _.online_time
+                i = 0
             sensor = {}
-            sensor['type'] = 0 #暂时默认置0
-            sensor['status'] = _.status
+            sensor['type'] = '0' #暂时默认置0
+            sensor['status'] = str(_.status)
             sensor['rawdata'] = _.data.dataFrame
             sensor['datatime'] = _.data.timestamp
             sensors.append(sensor)
