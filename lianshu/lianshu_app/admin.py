@@ -16,6 +16,8 @@ class Push_dataAdmin(admin.ModelAdmin):
 class Frame_dataAdmin(admin.ModelAdmin):
     list_display = ('data','decode_list','sta_id','status','count','manyi','action','get_time','online_time')
 
+class ExtraPropertyAdmin(admin.ModelAdmin):
+    list_display = ('data','devId','extra_id','name','value')
 
 admin.site.register(Push_data,Push_dataAdmin)
 admin.site.register(Gtw_info)
