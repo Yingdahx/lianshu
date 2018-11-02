@@ -96,7 +96,7 @@ def push(request):
     timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
     on_date = time.mktime(timestr.timetuple())
     frame.online_time = int(on_date)
-    frame.sta_id = str(int('0x'+fram_list[0],16) + int('0x'+fram_list[1],16)) #16进制转10进制->str存储
+    frame.sta_id = str(int('0x'+fram_list[0],16)) + str(int('0x'+fram_list[1],16)) #16进制转10进制->str存储
     frame.machine_id = raw['deveui']
     frame.status = int(fram_list[13])
     frame.save()
