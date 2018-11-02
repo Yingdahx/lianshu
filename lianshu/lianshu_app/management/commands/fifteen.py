@@ -32,32 +32,19 @@ class Command(BaseCommand):
 
         #推送时间段内的数据
         res = []
-        stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple)).values_list('sta_id').distinct()
-        stas = list(stas)
+        stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple))
         print(stas)
         for sta in stas:
-            #压站下的设备
-            datas = Frame_data.objects.filter(sta_id=sta[0],online_time__range=(last_tuple,now_tuple)).order_by('-online_time')
-            i = True
             pyload = {}
-            pyload['sensors'] = sensors = []
-            for _ in datas:
-                if i:
-                    pyload['station'] = _.sta_id
-                    pyload['spillover'] = _.manyi
-                    pyload['trunkNum'] = _.count
-                    pyload['operationNum'] = _.action
-                    pyload['refreshTime'] = _.get_time
-                    pyload['onlineTime'] = _.online_time
-                    i = False
-                sensor = {}
-                sensor['type'] = _.machine_id
-                sensor['status'] = str(_.status)
-                sensor['rawdata'] = _.data.dataFrame
-                sensor['datatime'] = _.data.timestamp
-                sensors.append(sensor)
+            pyload['station'] = sta.machine_id
+            pyload['spillover'] = sta.manyi
+            pyload['trunkNum'] = sta.count
+            pyload['operationNum'] = sta.action
+            pyload['refreshTime'] = sta.get_time
+            pyload['onlineTime'] = sta.online_time
+            #type字段暂时默认0
+            pyload['sensors'] = [{'type':0,'status':str(sta.status),'rawdata':sta.data.dataFrame,'datatime':sta.data.timestamp}]
             res.append(pyload)
-        print('-----post data-----')
         print('-----post data-----')
         print(res)
         print('-----post station num :'+str(len(res))+'-----')

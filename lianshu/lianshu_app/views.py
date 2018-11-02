@@ -49,7 +49,9 @@ def push(request):
     #格林威治时间转为北京时区时间字串
     timestr = timechange(raw['timestamp'])
 
-    data = Push_data()
+    data = Push_data.objects.filter(deveui=raw['deveui']).first()
+    if data.exists():
+        data = Push_data()
     data.data_id = raw['id']
     data.deveui = raw['deveui']
     data.timestamp = timestr
@@ -75,13 +77,15 @@ def push(request):
     data.latitude = raw['latitude']
     data.alive = raw['live']
     data.save()
-    print('原数据入库完成')
-
+    print('原数据更新入库完成')
+    
     #base64解码解析数据
     fram_list = base64_decode(raw['dataFrame'])
     print('解码后的字节码：',fram_list,sep='\n')
-    frame = Frame_data()
-    frame.data =  Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
+    frame = Frame_data.filter(deveui=raw['deveui']).first()
+    if not frame.exists():
+        frame = Frame_data()
+    frame.data =  data
     frame.decode_list = str(fram_list)
     frame.count = raw['fcnt']                       #第几箱垃圾  暂用FCNT字段
     frame.manyi = int(fram_list[2])                 #第2位 满溢度 
@@ -106,8 +110,10 @@ def push(request):
     if 'gtw_info' in raw.keys() and raw['gtw_info']:
         print('gtw_info数据',raw['gtw_info'],sep='\n')
         for r in raw['gtw_info']:
-            gtw = Gtw_info()
-            gtw.data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
+            gtw = Gtw_info.objects.filter(data=data,gtw_id=r['gtw_id'],rssi=r['rssi'],snr=r['snr']).first()
+            if not gtw.exists():
+                gtw = Gtw_info()
+            gtw.data = data
             gtw.gtw_id = r['gtw_id']
             gtw.rssi = r['rssi']
             gtw.snr = r['snr']
@@ -116,9 +122,10 @@ def push(request):
     if 'ExtraProperty' in raw.keys() and raw['ExtraProperty']:
         print('ExtraProperty数据',raw['ExtraProperty'],sep='\n')
         for e in raw['ExtraProperty']:
-            extra = ExtraProperty()
-            p_data = Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
-            extra.data = p_data
+            extra = ExtraProperty.objects.filter(data=data,devId=e['devId'],extra_id=e['id'],name=e['name'],value=e['value']).first()
+            if not extra.exists():
+                extra = ExtraProperty()
+            extra.data = data
             extra.devId = e['devId']
             extra.extra_id = e['id']
             extra.name = e['name']
@@ -133,10 +140,9 @@ def station(request):
     ctx = {}
     station_id = request.GET.get('station')
     print(station_id)
-    station_id = float(station_id)
     
-    frame = Frame_data.objects.filter(data__data_id=station_id).order_by('-online_time').first()
-    ctx['station_id'] = float(frame.data.data_id)    #小压站ID
+    frame = Frame_data.objects.filter(machine_id=station_id).order_by('-online_time').first()
+    ctx['station'] = int(frame.machine_id)    #小压站ID
     ctx['is_alive'] = frame.data.alive == str(True)  #设备是否在线 
     ctx['trunk_num'] = frame.count                   #今天第几箱垃圾                     
     ctx['spillover'] = frame.manyi                   #(当前箱垃圾的满溢度百分比) int (大于0小于100)   [2]
@@ -169,30 +175,18 @@ def test(request):
     # nowstr = now.strftime("%Y-%m-%d %H:%M:%S")                  #datetime->字符串
     # 比对 nowstr 及 last_str 即可
     res = []
-    stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple)).values_list('sta_id').distinct()
-    stas = list(stas)
+    stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple))
     print(stas)
     for sta in stas:
-        #压站下的设备
-        datas = Frame_data.objects.filter(sta_id=sta[0],online_time__range=(last_tuple,now_tuple)).order_by('-online_time')
-        i = True
         pyload = {}
-        pyload['sensors'] = sensors = []
-        for _ in datas:
-            if i:
-                pyload['station'] = _.sta_id
-                pyload['spillover'] = _.manyi
-                pyload['trunkNum'] = _.count
-                pyload['operationNum'] = _.action
-                pyload['refreshTime'] = _.get_time
-                pyload['onlineTime'] = _.online_time
-                i = False
-            sensor = {}
-            sensor['type'] = _.machine_id
-            sensor['status'] = str(_.status)
-            sensor['rawdata'] = _.data.dataFrame
-            sensor['datatime'] = _.data.timestamp
-            sensors.append(sensor)
+        pyload['station'] = sta.machine_id
+        pyload['spillover'] = sta.manyi
+        pyload['trunkNum'] = sta.count
+        pyload['operationNum'] = sta.action
+        pyload['refreshTime'] = sta.get_time
+        pyload['onlineTime'] = sta.online_time
+        #type字段暂时默认0
+        pyload['sensors'] = [{'type':0,'status':str(sta.status),'rawdata':sta.data.dataFrame,'datatime':sta.data.timestamp}]
         res.append(pyload)
     print('-----post data-----')
     # print(json.dumps(pyload))
