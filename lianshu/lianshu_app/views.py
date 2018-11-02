@@ -82,7 +82,7 @@ def push(request):
     #base64解码解析数据
     fram_list = base64_decode(raw['dataFrame'])
     print('解码后的字节码：',fram_list,sep='\n')
-    frame = Frame_data.filter(deveui=raw['deveui']).first()
+    frame = Frame_data.objects.filter(deveui=raw['deveui']).first()
     if not frame:
         frame = Frame_data()
     frame.data =  data
