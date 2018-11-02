@@ -50,7 +50,7 @@ def push(request):
     timestr = timechange(raw['timestamp'])
 
     data = Push_data.objects.filter(deveui=raw['deveui']).first()
-    if data:
+    if not data:
         data = Push_data()
     data.data_id = raw['id']
     data.deveui = raw['deveui']
