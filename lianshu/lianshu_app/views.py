@@ -31,7 +31,7 @@ def timechange(timestr):
 def base64_decode(base64_str):
     enstr = base64.b64decode(base64_str.encode('utf-8'))  #base64解码 16进制bytes
     strlist = [ hex(x) for x in enstr ] 
-    reslist = [ _[2:] for _ in strlist ]    #去掉头
+    reslist = [ _[2:] for _ in strlist ]    #'0x'去掉头
     return reslist
 
 @csrf_exempt
@@ -50,7 +50,7 @@ def push(request):
     timestr = timechange(raw['timestamp'])
 
     data = Push_data.objects.filter(deveui=raw['deveui']).first()
-    if data.exists():
+    if data:
         data = Push_data()
     data.data_id = raw['id']
     data.deveui = raw['deveui']
@@ -83,7 +83,7 @@ def push(request):
     fram_list = base64_decode(raw['dataFrame'])
     print('解码后的字节码：',fram_list,sep='\n')
     frame = Frame_data.filter(deveui=raw['deveui']).first()
-    if not frame.exists():
+    if not frame:
         frame = Frame_data()
     frame.data =  data
     frame.decode_list = str(fram_list)
@@ -111,7 +111,7 @@ def push(request):
         print('gtw_info数据',raw['gtw_info'],sep='\n')
         for r in raw['gtw_info']:
             gtw = Gtw_info.objects.filter(data=data,gtw_id=r['gtw_id'],rssi=r['rssi'],snr=r['snr']).first()
-            if not gtw.exists():
+            if not gtw:
                 gtw = Gtw_info()
             gtw.data = data
             gtw.gtw_id = r['gtw_id']
@@ -123,7 +123,7 @@ def push(request):
         print('ExtraProperty数据',raw['ExtraProperty'],sep='\n')
         for e in raw['ExtraProperty']:
             extra = ExtraProperty.objects.filter(data=data,devId=e['devId'],extra_id=e['id'],name=e['name'],value=e['value']).first()
-            if not extra.exists():
+            if not extra:
                 extra = ExtraProperty()
             extra.data = data
             extra.devId = e['devId']
