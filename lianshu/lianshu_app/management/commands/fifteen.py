@@ -35,7 +35,6 @@ class Command(BaseCommand):
         resp['res']= res = []
         stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple)).values_list('sta_id').distinct()
         stas = list(stas)
-        print(stas)
         for sta in stas:
             datas = Frame_data.objects.filter(sta_id=sta[0],online_time__range=(last_tuple,now_tuple)).order_by('-online_time')
             i = 1
@@ -58,6 +57,7 @@ class Command(BaseCommand):
                 sensors.append(sensor)
             res.append(pyload)
         print('-----post data-----')
+        print(resp)
         print('-----post station num :'+str(len(res))+'-----')
 
         # logger.debug('-----post data-----')
