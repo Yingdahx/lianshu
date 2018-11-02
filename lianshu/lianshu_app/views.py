@@ -3,6 +3,7 @@ from django.conf import settings
 from django.http import HttpResponse, JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from lianshu_app.models import *
+from django.db.models import Count,Sum
 
 import json
 import random
@@ -228,6 +229,7 @@ def test(request):
 
 @csrf_exempt
 def log_test(request):
+    Push_data.objects.all().delete()
     Frame_data.objects.all().delete()
     # # logger = logging.getLogger("15") # django为loggers中定义的名称
 
