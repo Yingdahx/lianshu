@@ -82,7 +82,7 @@ def push(request):
     frame = Frame_data()
     frame.data =  Push_data.objects.filter(data_id=raw['id'],deveui = raw['deveui'],timestamp = timestr).first()
     frame.decode_list = str(fram_list)
-    frame.count = 1                              #第几箱垃圾  暂无解析字段
+    frame.count = raw['fcnt']                       #第几箱垃圾  暂用FCNT字段
     frame.manyi = int(fram_list[2])                 #第2位 满溢度 
     frame.action = int('0x'+fram_list[5],16)     #第5位 翻斗次数 转回十进制
     #拼接 生成datetime
@@ -95,7 +95,8 @@ def push(request):
     timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
     on_date = time.mktime(timestr.timetuple())
     frame.online_time = int(on_date)
-    frame.sta_id = fram_list[0] +  fram_list[1]
+    frame.sta_id = str(int('0x'+fram_list[0],16) + int('0x'+fram_list[1],16)) #16进制转10进制->str存储
+    frame.machine_id = raw['deveui']
     frame.status = int(fram_list[13])
     frame.save()
     print('转码后入库的信息:','满溢度',int(fram_list[2]),'翻斗次数',int('0x'+fram_list[5],16),
@@ -144,52 +145,36 @@ def station(request):
 
     return  JsonResponse(ctx,safe=False)
 
-@csrf_exempt
-def push_station(request):
-    #接收test推送的数据接口
-    if request.method != 'POST':
-        return JsonResponse({ 'success': False, 'code': -1, 'msg': '只支持POST' }, status=405)
-
-    raw = json.loads(request.body.decode('utf-8'))
-    action = Station.objects.get_or_create(station_id=raw['station'],spillover=raw['spillover'])
-    station =  Station.objects.filter(station_id=raw['station'],spillover=raw['spillover']).first()
-    sensors = raw['sensors']
-    for sensor in sensors:
-        new = Sensor()
-        new.station = station
-        new.sensor_type = sensor['type']
-        new.status = sensor['status']
-        new.rawdata = sensor['rawdata']
-        new.datatime = sensor['datatime']
-        new.save()
-    return JsonResponse({ 'success': True })
 
 @csrf_exempt
 def test(request):
-    #需求3：定时任务测试 每15分钟推送一次数据到指定url接口上 测试接口
+    #需求3：15分钟推送定时任务测试
+    #请求头
     headers = {
         "Content-Type": "application/json; charset=UTF-8",
         }
+    #请求地址
     url = "http://101.89.135.132/compressionstation/spillover/add/"
 
+    #当前时间
     now = datetime.datetime.now() #datetime
     print('-----begin-----')
     print(now)
-    
+    #当前时间时间戳-15分钟前时间戳
     now_tuple = int(time.mktime(now.timetuple()))                 #datetime->时间戳
-    last_tuple = now_tuple - 900                                  #15分钟前的时间戳    
+    last_tuple = now_tuple - 900                                    
     # last_date = time.localtime(last_tuple)                      #时间戳->datetime
     # last_str = time.strftime("%Y-%m-%d %H:%M:%S", last_date)    #datetime->字符串
     # nowstr = now.strftime("%Y-%m-%d %H:%M:%S")                  #datetime->字符串
     # 比对 nowstr 及 last_str 即可
-    resp = {}
-    resp['res']= res = []
+    res = []
     stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple)).values_list('sta_id').distinct()
     stas = list(stas)
     print(stas)
     for sta in stas:
+        #压站下的设备
         datas = Frame_data.objects.filter(sta_id=sta[0],online_time__range=(last_tuple,now_tuple)).order_by('-online_time')
-        i = 1
+        i = True
         pyload = {}
         pyload['sensors'] = sensors = []
         for _ in datas:
@@ -200,9 +185,9 @@ def test(request):
                 pyload['operationNum'] = _.action
                 pyload['refreshTime'] = _.get_time
                 pyload['onlineTime'] = _.online_time
-                i = 0
+                i = False
             sensor = {}
-            sensor['type'] = '0' #暂时默认置0
+            sensor['type'] = _.machine_id
             sensor['status'] = str(_.status)
             sensor['rawdata'] = _.data.dataFrame
             sensor['datatime'] = _.data.timestamp
@@ -213,7 +198,7 @@ def test(request):
     # response = requests.post(url, data=json.dumps(pyload), headers=headers).text
     # print('------post response-----')
     # print(response)
-    return JsonResponse(resp,safe=False)
+    return JsonResponse(res,safe=False)
 
 # post data :
 # {  

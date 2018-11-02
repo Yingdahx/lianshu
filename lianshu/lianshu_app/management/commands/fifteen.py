@@ -31,13 +31,14 @@ class Command(BaseCommand):
         url = "http://101.89.135.132/compressionstation/spillover/add/"
 
         #推送时间段内的数据
-        resp = {}
-        resp['res']= res = []
+        res = []
         stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple)).values_list('sta_id').distinct()
         stas = list(stas)
+        print(stas)
         for sta in stas:
+            #压站下的设备
             datas = Frame_data.objects.filter(sta_id=sta[0],online_time__range=(last_tuple,now_tuple)).order_by('-online_time')
-            i = 1
+            i = True
             pyload = {}
             pyload['sensors'] = sensors = []
             for _ in datas:
@@ -48,22 +49,23 @@ class Command(BaseCommand):
                     pyload['operationNum'] = _.action
                     pyload['refreshTime'] = _.get_time
                     pyload['onlineTime'] = _.online_time
-                    i = 0
+                    i = False
                 sensor = {}
-                sensor['type'] = '0' #暂时默认置0
+                sensor['type'] = _.machine_id
                 sensor['status'] = str(_.status)
                 sensor['rawdata'] = _.data.dataFrame
                 sensor['datatime'] = _.data.timestamp
                 sensors.append(sensor)
             res.append(pyload)
         print('-----post data-----')
-        print(resp)
+        print('-----post data-----')
+        print(res)
         print('-----post station num :'+str(len(res))+'-----')
 
         # logger.debug('-----post data-----')
         # logger.debug('-----post station:'+str(len(res)))
         try :
-            response = requests.post(url, data=json.dumps(resp), headers=headers).text
+            response = requests.post(url, data=json.dumps(res), headers=headers).text
             print('-----post success-----'+response)
         except Exception as e:
             print('-----post failed-----')

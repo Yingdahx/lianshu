@@ -14,7 +14,7 @@ class Push_dataAdmin(admin.ModelAdmin):
     	'name','longitude','latitude')
 
 class Frame_dataAdmin(admin.ModelAdmin):
-    list_display = ('data','decode_list','sta_id','status','count','manyi','action','get_time','online_time')
+    list_display = ('data','decode_list','sta_id','machine_id','status','count','manyi','action','get_time','online_time')
 
 class ExtraPropertyAdmin(admin.ModelAdmin):
     list_display = ('data','devId','extra_id','name','value')
