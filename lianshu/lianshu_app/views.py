@@ -143,13 +143,18 @@ def station(request):
     
     frame = Frame_data.objects.filter(machine_id=station_id).order_by('-online_time').first()
     if frame:
-        ctx['station'] = int(frame.machine_id)    #小压站ID
-        ctx['is_alive'] = frame.data.alive == str(True)  #设备是否在线 
-        ctx['trunk_num'] = frame.count                   #今天第几箱垃圾                     
-        ctx['spillover'] = frame.manyi                   #(当前箱垃圾的满溢度百分比) int (大于0小于100)   [2]
-        ctx['operation_num'] =  frame.action             #(垃圾翻斗动作了几次) int                     [5]
-        ctx['update_time'] = frame.get_time              #(上次收到数据的时间) int （unix 时间戳）       [18] [24]
-        ctx['online_time'] = frame.online_time           #(设备上线时间) int （unix 时间戳）            
+        ctx['code'] = 1
+        ctx['data'] = res = {}
+        res['station'] = int(frame.machine_id)    #小压站ID
+        res['is_alive'] = frame.data.alive == str(True)  #设备是否在线 
+        res['trunk_num'] = frame.count                   #今天第几箱垃圾                     
+        res['spillover'] = frame.manyi                   #(当前箱垃圾的满溢度百分比) int (大于0小于100)   [2]
+        res['operation_num'] =  frame.action             #(垃圾翻斗动作了几次) int                     [5]
+        res['update_time'] = frame.get_time              #(上次收到数据的时间) int （unix 时间戳）       [18] [24]
+        res['online_time'] = frame.online_time           #(设备上线时间) int （unix 时间戳） 
+    else:
+        ctx['code'] = 0
+        ctx['message'] = '暂无该压站数据'
 
     return  JsonResponse(ctx,safe=False)
 
