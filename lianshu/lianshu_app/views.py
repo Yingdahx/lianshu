@@ -167,7 +167,8 @@ def test(request):
         "Content-Type": "application/json; charset=UTF-8",
         }
     #请求地址
-    url = "http://101.89.135.132/compressionstation/spillover/add/"
+    # url = "http://101.89.135.132/compressionstation/spillover/add/" #prod
+    url = "http://101.89.135.80/compressionstation/spillover/add/"  #test
 
     #当前时间
     now = datetime.datetime.now() #datetime

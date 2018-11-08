@@ -28,7 +28,8 @@ class Command(BaseCommand):
         headers = {
             "Content-Type": "application/json; charset=UTF-8",
             }
-        url = "http://101.89.135.132/compressionstation/spillover/add/"
+        # url = "http://101.89.135.132/compressionstation/spillover/add/" #prod
+        url = "http://101.89.135.80/compressionstation/spillover/add/"  #test
 
         #推送时间段内的数据
         res = []
