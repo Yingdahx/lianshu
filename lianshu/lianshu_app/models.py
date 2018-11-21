@@ -10,17 +10,17 @@ class Push_data(models.Model):
 	timestamp = models.CharField(max_length=200,default='',verbose_name='数据上报时间')
 	devaddr = models.DecimalField(max_digits=20,decimal_places=1,verbose_name='设备物理地址')
 	dataFrame = models.CharField(max_length=200,default='',verbose_name='设备业务原始数据(Base64编码)')
-	fcnt = models.DecimalField(max_digits=5,decimal_places=1,verbose_name='fcnt')
-	port = models.DecimalField(max_digits=5,decimal_places=1,verbose_name='port')
-	rssi = models.DecimalField(max_digits=5,decimal_places=1,verbose_name='信号强度')
-	snr = models.DecimalField(max_digits=5,decimal_places=1,verbose_name='信噪比')
+	fcnt = models.DecimalField(max_digits=10,decimal_places=1,verbose_name='fcnt')
+	port = models.DecimalField(max_digits=10,decimal_places=1,verbose_name='port')
+	rssi = models.DecimalField(max_digits=10,decimal_places=1,verbose_name='信号强度')
+	snr = models.DecimalField(max_digits=19,decimal_places=1,verbose_name='信噪比')
 	freq = models.DecimalField(max_digits=20,decimal_places=1,verbose_name='freq')
 	devId = models.CharField(max_length=200,default='',verbose_name='devId')
 	appId = models.CharField(max_length=200,default='',verbose_name = '应用编号')
-	sf_used = models.DecimalField(max_digits=5,decimal_places=1,verbose_name = 'sf_used')
+	sf_used = models.DecimalField(max_digits=10,decimal_places=1,verbose_name = 'sf_used')
 	dr_used = models.CharField(max_length=200,default='',verbose_name = 'dr_used')
 	cr_used = models.CharField(max_length=200,default='',verbose_name = 'cr_used')
-	device_redundancy = models.DecimalField(max_digits=5, decimal_places=1,verbose_name = 'device_redundancy')#冗余
+	device_redundancy = models.DecimalField(max_digits=10, decimal_places=1,verbose_name = 'device_redundancy')#冗余
 	time_on_air_ms = models.DecimalField(max_digits=10, decimal_places=3,verbose_name = 'time_on_air_ms')
 	decrypted = models.CharField(max_length=200,default='',verbose_name = '是否解密(decrypted)') #
 	status = models.CharField(max_length=200,default='',verbose_name = 'status')
