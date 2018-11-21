@@ -25,7 +25,5 @@ urlpatterns = [
     path('test/',views.test),
     path('log_test/',views.log_test),
 
-    #电信test
-    path('test_push/',views.test_push),
 
 ]
