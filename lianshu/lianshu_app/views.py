@@ -76,7 +76,10 @@ def push(request):
     data.longitude = raw['longitude']
     data.latitude = raw['latitude']
     data.alive = raw['live']
-    data.save()
+    try:
+        data.save()
+    except Exception as e:
+        print('-----！！！存储出错！！！-----',e)
     print('原数据更新入库完成')
     
     #base64解码解析数据
@@ -246,20 +249,7 @@ def log_test(request):
     # # return HttpRequest('test end') 
     return HttpResponse('test')
 
-#电信数据test
-@csrf_exempt
-def test_push(request):
-    res = []
-    if request.method != 'POST':
-        return JsonResponse({ 'success': False, 'code': -1, 'msg': '只支持POST' }, status=405)
 
-    raw = json.loads(request.body.decode('utf-8'))
-    json_root = settings.MEDIA_ROOT + '/json/test/' + '%d.json' % time.time()  #json保存路径
-
-    with open(json_root, 'w') as f:
-        f.write(json.dumps(raw, indent=4))
-
-    return JsonResponse({'success':True,'code':1,},status=200)
 
 
 
