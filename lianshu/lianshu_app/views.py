@@ -98,11 +98,11 @@ def push(request):
         hour=int(fram_list[22]),minute=int(fram_list[23]),second=int(fram_list[24]))
     #转成时间戳 float -> int
     d_unix = time.mktime(f_date.timetuple())
-    frame.get_time = int(d_unix)
+    frame.get_time = str(int(d_unix))
     #str -> datetime -> float -> int 
     timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
     on_date = time.mktime(timestr.timetuple())
-    frame.online_time = int(on_date)
+    frame.online_time = str(int(on_date))
     frame.sta_id = str(int('0x'+fram_list[0],16)) + str(int('0x'+fram_list[1],16)) #16进制转10进制->str存储
     frame.machine_id = raw['deveui']
     frame.status = int(fram_list[13])

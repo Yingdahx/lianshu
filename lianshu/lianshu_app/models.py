@@ -71,8 +71,8 @@ class Frame_data(models.Model):
 	manyi =  models.IntegerField(default=0,verbose_name='设备满溢参数')
 	action = models.IntegerField(default=0,verbose_name='垃圾翻斗动作次数')
 	status = models.IntegerField(default=0,verbose_name='是否在线')
-	get_time = models.IntegerField(default=0,verbose_name='上次收到数据时间')
-	online_time = models.IntegerField(default=0,verbose_name='设备上线时间')
+	get_time = models.CharField(max_length=500,default='',verbose_name='上次收到数据时间')
+	online_time = models.CharField(max_length=500,default='',verbose_name='设备上线时间')
 
 	def __str__(self):
 		return '小压站:' + str(self.data.data_id) +'小压站标识'+self.sta_id+'设备EUI' + self.machine_id + '解析字符串' + self.decode_list
