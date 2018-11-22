@@ -47,7 +47,6 @@ class Command(BaseCommand):
             pyload['sensors'] = [{'type':0,'status':str(sta.status),'rawdata':sta.data.dataFrame,'datatime':sta.data.timestamp}]
             res.append(pyload)
         print('-----post data-----')
-        print(res)
         print('-----post station num :'+str(len(res))+'-----')
 
         # logger.debug('-----post data-----')
