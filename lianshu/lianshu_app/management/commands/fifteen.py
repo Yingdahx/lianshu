@@ -34,7 +34,6 @@ class Command(BaseCommand):
         #推送时间段内的数据
         res = []
         stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple))
-        print(stas)
         for sta in stas:
             pyload = {}
             pyload['station'] = sta.machine_id
