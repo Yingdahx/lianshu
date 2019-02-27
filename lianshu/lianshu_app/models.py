@@ -76,6 +76,79 @@ class Frame_data(models.Model):
 
 	def __str__(self):
 		return '小压站:' + str(self.data.data_id) +'小压站标识'+self.sta_id+'设备EUI' + self.machine_id + '解析字符串' + self.decode_list
+
+
+class Yaun_Push_data(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = '原数据接收数据(原数据)'
+
+	#DecimalField类型max_digits-总位数，decimal_places-小数点后精确位数
+	data_id = models.DecimalField(max_digits=20,decimal_places=1,verbose_name='ID')
+	deveui = models.CharField(max_length=200,default='',verbose_name='设备的EUI')
+	timestamp = models.CharField(max_length=200,default='',verbose_name='数据上报时间')
+	devaddr = models.DecimalField(max_digits=20,decimal_places=1,verbose_name='设备物理地址')
+	dataFrame = models.CharField(max_length=200,default='',verbose_name='设备业务原始数据(Base64编码)')
+	fcnt = models.DecimalField(max_digits=10,decimal_places=1,verbose_name='fcnt')
+	port = models.DecimalField(max_digits=10,decimal_places=1,verbose_name='port')
+	rssi = models.DecimalField(max_digits=10,decimal_places=1,verbose_name='信号强度')
+	snr = models.DecimalField(max_digits=19,decimal_places=1,verbose_name='信噪比')
+	freq = models.DecimalField(max_digits=20,decimal_places=1,verbose_name='freq')
+	devId = models.CharField(max_length=200,default='',verbose_name='devId')
+	appId = models.CharField(max_length=200,default='',verbose_name = '应用编号')
+	sf_used = models.DecimalField(max_digits=10,decimal_places=1,verbose_name = 'sf_used')
+	dr_used = models.CharField(max_length=200,default='',verbose_name = 'dr_used')
+	cr_used = models.CharField(max_length=200,default='',verbose_name = 'cr_used')
+	device_redundancy = models.DecimalField(max_digits=10, decimal_places=1,verbose_name = 'device_redundancy')#冗余
+	time_on_air_ms = models.DecimalField(max_digits=10, decimal_places=3,verbose_name = 'time_on_air_ms')
+	decrypted = models.CharField(max_length=200,default='',verbose_name = '是否解密(decrypted)') #
+	status = models.CharField(max_length=200,default='',verbose_name = 'status')
+	address = models.CharField(max_length=200,default='',verbose_name = 'address')
+	name = models.CharField(max_length=200,default='',null=True,verbose_name = 'name')
+	longitude = models.DecimalField(max_digits=15,decimal_places=1,verbose_name = 'longitude')
+	latitude = models.DecimalField(max_digits=15,decimal_places=1,verbose_name = 'latitude')
+	alive = models.CharField(max_length=200,default='',verbose_name='是否在线')
+	data_hex = models.CharField(max_length=200,default='',verbose_name='解码处理后的16字节list字符串')
+	create_time = models.DateTimeField(auto_now_add=True,verbose_name='创建时间',null=True)
+	update_time = models.DateTimeField(auto_now=True,verbose_name='修改时间')
+
+	def __str__(self):
+		return 'ID:' + str(self.data_id) + '     设备的EUI:' + self.deveui + '     数据上报时间' + self.timestamp 
+
+
+class Bao_Wei(models.Model):
+	class  Meta:
+		verbose_name = verbose_name_plural = '报文表'
+
+	bw_name = models.CharField(max_length=50,default='',verbose_name = '接口名称/项目名')
+	bw_input_txt = models.CharField(max_length=1000,default='',verbose_name = '返回报文')
+	bw_out_txt = models.CharField(max_length=1000,default='',verbose_name = '输出报文')
+	create_time = models.DateTimeField(auto_now_add=True,verbose_name='创建时间')
+	update_time = models.DateTimeField(auto_now=True,verbose_name='修改时间')
+
+	def __str__(self):
+		return '接口名称/项目名:' + self.bw_name + '创建时间:' + self.create_time
+
+			
+		
+
+
+class Yaun_Frame_data(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = '原数据base64解析数据'
+
+	data = models.ForeignKey(Push_data,on_delete=models.CASCADE,verbose_name='绑定数据')
+	decode_list = models.CharField(max_length=500,default='',verbose_name='解码字符串list')
+	sta_id = models.CharField(max_length=20,default='',verbose_name='小压站标识')
+	machine_id = models.CharField(max_length=200,default='',verbose_name='设备的EUI')
+	count = models.IntegerField(default=0,verbose_name='今天第几箱垃圾(暂用fcnt字段)')
+	manyi =  models.IntegerField(default=0,verbose_name='设备满溢参数')
+	action = models.IntegerField(default=0,verbose_name='垃圾翻斗动作次数')
+	status = models.IntegerField(default=0,verbose_name='是否在线')
+	get_time = models.CharField(max_length=500,default='',verbose_name='上次收到数据时间')
+	online_time = models.CharField(max_length=500,default='',verbose_name='设备上线时间')
+
+	def __str__(self):
+		return '小压站:' + str(self.data.data_id) +'小压站标识'+self.sta_id+'设备EUI' + self.machine_id + '解析字符串' + self.decode_list
 			
 
 class Station(models.Model):

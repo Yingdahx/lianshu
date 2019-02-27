@@ -11,7 +11,6 @@ import requests
 import time,datetime
 import base64
 import logging
-
 #格林威治时间转换
 def timechange(timestr):
     #'2018-10-26T06:25:04.845Z'
@@ -34,6 +33,7 @@ def base64_decode(base64_str):
     reslist = [ _[2:] for _ in strlist ]    #'0x'去掉头
     return reslist
 
+
 @csrf_exempt
 def push(request):
     #需求1 : 被动接收数据接口
@@ -41,6 +41,9 @@ def push(request):
         return JsonResponse({ 'success': False, 'code': -1, 'msg': '只支持POST' }, status=405)
 
     raw = json.loads(request.body.decode('utf-8'))
+    print('开始保存原数据！')
+    yuanshishuju(raw)
+    print('保存原数据成功！')
 
     # json_root = settings.MEDIA_ROOT  + '%d.json' % time.time()  #json保存路径
     # with open(json_root, 'w') as f:
@@ -250,8 +253,66 @@ def log_test(request):
     return HttpResponse('test')
 
 
+def yuanshishuju(raw):
+    try:
+        Bao_Wei.objects.create(bw_name='小压站', bw_input_txt=raw)
+        
+    except Exception as e:
+        print(e)
+    try:
+        timestr = timechange(raw['timestamp'])
+        Yaun_Push_data.objects.create(
+            data_id = raw['id'],
+            deveui = raw['deveui'],
+            timestamp = timestr,
+            devaddr = raw['devaddr'],
+            dataFrame = raw['dataFrame'],
+            fcnt = raw['fcnt'],
+            port = raw['port'],
+            rssi = raw['rssi'],
+            snr = raw['snr'],
+            freq = raw['freq'],
+            devId = raw['devId'],
+            appId = raw['appId'],
+            sf_used = raw['sf_used'],
+            dr_used = raw['dr_used'],
+            cr_used = raw['cr_used'],
+            device_redundancy = raw['device_redundancy'],
+            time_on_air_ms = raw['time_on_air_ms'],
+            decrypted = raw['decrypted'],
+            status = raw['status'],
+            address = raw['address'],
+            name = raw['name'],
+            longitude = raw['longitude'],
+            latitude = raw['latitude'],
+            alive = raw['live']
+            )
+    except Exception as e:
+        print('Yaun_Push_data.create' + e)
 
-
+    try:
+        #base64解码解析数据
+        data = Yaun_Push_data.objects.filter(data_id=raw['id']).order_by('-create_time').first()
+        if data:
+            fram_list = base64_decode(raw['dataFrame'])
+            f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),hour=int(fram_list[22]),minute=int(fram_list[23]),second=int(fram_list[24]))
+            d_unix = time.mktime(f_date.timetuple())
+            timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
+            on_date = time.mktime(timestr.timetuple())
+            Yaun_Frame_data.objects.create(
+                data=data,
+                decode_list=str(fram_list),
+                count = raw['fcnt'],
+                manyi = int(fram_list[2]),
+                action = int('0x'+fram_list[5],16),
+                get_time = str(int(d_unix)),
+                online_time = str(int(on_date)),
+                sta_id = str(int('0x'+fram_list[0],16)) + str(int('0x'+fram_list[1],16)),
+                machine_id = raw['deveui'],
+                status = int(fram_list[13])
+                )
+    except Exception as e:
+        print('Yaun_Frame_data.create' + e)
 
 
 
