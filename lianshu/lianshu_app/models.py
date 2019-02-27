@@ -126,7 +126,7 @@ class Bao_Wei(models.Model):
 	update_time = models.DateTimeField(auto_now=True,verbose_name='修改时间')
 
 	def __str__(self):
-		return '接口名称/项目名:' + self.bw_name + '创建时间:' + self.create_time
+		return '接口名称/项目名:' + self.bw_name
 
 			
 		
