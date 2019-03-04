@@ -14,6 +14,7 @@ import logging
 #格林威治时间转换
 def timechange(timestr):
     #'2018-10-26T06:25:04.845Z'
+    #2019-03-03T05:59:43.755Z
     try:
         timestr = timestr.split('.')[0]
     except:
@@ -288,7 +289,7 @@ def yuanshishuju(raw):
             alive = raw['live']
             )
     except Exception as e:
-        print('Yaun_Push_data.create' + e)
+        print('Yaun_Push_data.create')
 
     try:
         #base64解码解析数据
@@ -312,7 +313,7 @@ def yuanshishuju(raw):
                 status = int(fram_list[13])
                 )
     except Exception as e:
-        print('Yaun_Frame_data.create' + e)
+        print('Yaun_Frame_data.create')
 
 
 

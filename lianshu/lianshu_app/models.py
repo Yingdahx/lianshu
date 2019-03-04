@@ -136,7 +136,7 @@ class Yaun_Frame_data(models.Model):
 	class Meta:
 		verbose_name = verbose_name_plural = '原数据base64解析数据'
 
-	data = models.ForeignKey(Push_data,on_delete=models.CASCADE,verbose_name='绑定数据')
+	data = models.ForeignKey(Yaun_Push_data,on_delete=models.CASCADE,verbose_name='绑定数据')
 	decode_list = models.CharField(max_length=500,default='',verbose_name='解码字符串list')
 	sta_id = models.CharField(max_length=20,default='',verbose_name='小压站标识')
 	machine_id = models.CharField(max_length=200,default='',verbose_name='设备的EUI')
