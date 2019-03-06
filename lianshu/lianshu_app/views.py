@@ -371,19 +371,17 @@ def adjust(payload, *args):
         c3 &= (p_check['Lock'] == 0)
 
     s = p['S']
+
     if c1 and not c2:
-        s += p['N2'] * adjust.P1
-        return s
+        s += min(p['N2'], 50) * adjust.P1
 
-    if c2 and not c1:
-        s += p['N1'] * adjust.P2
-        return s
+    elif c2 and not c1:
+        s += min(p['N1'], 60) * adjust.P2
 
-    if c3 and p['N1'] > 60 and p['N2'] > 50:
-        s -= p['N1'] * adjust.P1
-        s -= p['N2'] * adjust.P2
+    elif c3 and p['N1'] > 60 and p['N2'] > 50:
+        s -= min(p['N1'], 60) * adjust.P1
+        s -= min(p['N2'], 50) * adjust.P2
         s += 60 * adjust.P1 + 50 * adjust.P2
-        return s
 
     return s
 
@@ -401,6 +399,9 @@ def get_manyi(deveui):
     adjust.P1 = 0.7
     adjust.P2 = 0.15
     manyidu = 0
+    manyi_list =['4c 4a 54 01 00 9c 02 00 5c 03 00 00 10 00 56 95 1f b9 20 19 03 06 12 20 32 33', 
+    '4c 4a 54 01 00 9c 02 00 5c 03 00 00 10 00 56 95 1f b9 20 19 03 06 12 20 32 33',
+    '4c 4a 54 01 00 9c 02 00 5c 03 00 00 10 00 56 95 1f b9 20 19 03 06 12 20 32 33']
     if len(manyi_list) == 0:
         manyidu = 0
     elif len(manyi_list) == 1:
