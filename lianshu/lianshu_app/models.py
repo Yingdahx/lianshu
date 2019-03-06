@@ -45,7 +45,8 @@ class Gtw_info(models.Model):
 
 	def __str__(self):
 		return 'gtw_id:' + self.gtw_id + '     绑定数据:' + str(self.data)
- 
+
+
 class ExtraProperty(models.Model):
 	class Meta:
 		verbose_name = verbose_name_plural = 'ExtraProperty'
@@ -136,7 +137,7 @@ class Yaun_Frame_data(models.Model):
 	class Meta:
 		verbose_name = verbose_name_plural = '原数据base64解析数据'
 
-	data = models.ForeignKey(Yaun_Push_data,on_delete=models.CASCADE,verbose_name='绑定数据')
+	data = models.ForeignKey(Yaun_Push_data,on_delete=models.CASCADE,verbose_name='绑定数据',null=True)
 	decode_list = models.CharField(max_length=500,default='',verbose_name='解码字符串list')
 	sta_id = models.CharField(max_length=20,default='',verbose_name='小压站标识')
 	machine_id = models.CharField(max_length=200,default='',verbose_name='设备的EUI')
@@ -177,7 +178,20 @@ class Sensor(models.Model):
 
 	def __str__(self):
 		return '传感器类型：' + self.sensor_type + '传感器状态：' + self.status + '数据采集时间:' + self.datatime + '入库时间:' + str(self.add_time)
- 
+
+
+class Error(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = '差错表'
+
+	error_id = models.CharField(max_length=100,default='',verbose_name='出错数据id')
+	error_address = models.CharField(max_length=100,default='',verbose_name='出错位置')
+	error_bw = models.CharField(max_length=1000,default='',verbose_name='出错报文')
+	create_time = models.DateTimeField(auto_now_add=True,verbose_name='创建时间',null=True)
+	update_time = models.DateTimeField(auto_now=True,verbose_name='修改时间')
+
+	def __str__(self):
+		return '出错小站ID：' + self.error_id + '，出错位置：' +  self.error_address + '，出错时间：' + str(self.create_time)
 
 			
 			

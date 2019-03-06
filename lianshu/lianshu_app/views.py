@@ -11,6 +11,8 @@ import requests
 import time,datetime
 import base64
 import logging
+import struct
+from pprint import pprint
 #格林威治时间转换
 def timechange(timestr):
     #'2018-10-26T06:25:04.845Z'
@@ -89,13 +91,23 @@ def push(request):
     #base64解码解析数据
     fram_list = base64_decode(raw['dataFrame'])
     print('解码后的字节码：',fram_list,sep='\n')
+
+    #开始调用满溢度计算公式
+    print('开始调用满溢度计算公式')
+    try:
+        get_manyi_value = get_manyi(raw['deveui'])
+    except Exception as e:
+        print('满溢度计算出错')
+
+    print('满溢度计算完成')
+
     frame = Frame_data.objects.filter(machine_id=raw['deveui']).first()
     if not frame:
         frame = Frame_data()
     frame.data =  data
     frame.decode_list = str(fram_list)
     frame.count = raw['fcnt']                       #第几箱垃圾  暂用FCNT字段
-    frame.manyi = int(fram_list[2])                 #第2位 满溢度 
+    frame.manyi = get_manyi_value                #第2位 满溢度 
     frame.action = int('0x'+fram_list[5],16)     #第5位 翻斗次数 转回十进制
     #拼接 生成datetime
     f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),
@@ -260,6 +272,7 @@ def yuanshishuju(raw):
         
     except Exception as e:
         print(e)
+        pass
     try:
         timestr = timechange(raw['timestamp'])
         Yaun_Push_data.objects.create(
@@ -289,7 +302,10 @@ def yuanshishuju(raw):
             alive = raw['live']
             )
     except Exception as e:
+        Error.objects.create(error_id=raw['id'], error_address='保存原数据报错', error_bw=raw)
         print('Yaun_Push_data.create')
+        pass
+        
 
     try:
         #base64解码解析数据
@@ -313,9 +329,102 @@ def yuanshishuju(raw):
                 status = int(fram_list[13])
                 )
     except Exception as e:
-        print('Yaun_Frame_data.create')
+        Error.objects.create(error_id=raw['id'], error_address='base64转码报错报错', error_bw=raw)
+        print('Yaun_Frame_data.create' + e)
+        pass
+        
 
 
+
+hex_to_byte = lambda _: bytes.fromhex(_)
+byte_to_hex = lambda _: ''.join([ "%02X" % x for x in _])
+hex_to_json = lambda payload, *args: dict(zip([arg[0] for arg in args], [byte_to_hex(_) if not isinstance(_, int) else _ for _ in struct.unpack('>'+''.join([arg[1] for arg in args]), hex_to_byte(payload.replace(' ', '')))]))
+
+
+#满溢度
+def adjust(payload, *args):
+
+    def parse(payload):
+        return hex_to_json(payload.replace(' ', ''),
+            ('LJ', '2s'),
+            ('S', 'b'),
+            ('N1', 'xh'),
+            ('Lock', 'xh'),
+            ('N2', 'xh'),
+            ('Power', '2s'),
+            ('V', 'h'),
+            ('A', 'h'),
+            ('t', '7s'),
+            ('END', 'b')
+        )
+    p = parse(payload)
+
+    c1 = (p['N1'] == 0)
+    c2 = (p['N2'] == 0)
+    c3 = (p['Lock'] == 0)
+
+    for arg in args:
+        p_check = parse(arg)
+
+        c1 &= (p_check['N1'] == 0)
+        c2 &= (p_check['N2'] == 0)
+        c3 &= (p_check['Lock'] == 0)
+
+    s = p['S']
+    if c1 and not c2:
+        s += p['N2'] * adjust.P1
+        return s
+
+    if c2 and not c1:
+        s += p['N1'] * adjust.P2
+        return s
+
+    if c3 and p['N1'] > 60 and p['N2'] > 50:
+        s -= p['N1'] * adjust.P1
+        s -= p['N2'] * adjust.P2
+        s += 60 * adjust.P1 + 50 * adjust.P2
+        return s
+
+    return s
+
+
+def get_manyi(deveui):
+    manyi_list = []
+
+    frame = Yaun_Frame_data.objects.filter(machine_id=deveui).order_by('-data__create_time')[0:3]
+    for x in frame:
+        if x.decode_list:
+            get_new_manyi = get_manyi_list(x.decode_list)
+            if get_new_manyi:
+                manyi_list.append(get_new_manyi)
+
+    adjust.P1 = 0.7
+    adjust.P2 = 0.15
+    manyidu = 0
+    if len(manyi_list) == 0:
+        manyidu = 0
+    elif len(manyi_list) == 1:
+        manyidu = adjust(manyi_list[0])
+    elif len(manyi_list) == 2:
+        manyidu = adjust(manyi_list[0], manyi_list[1])
+    elif len(manyi_list) == 3:
+        manyidu = adjust(manyi_list[0], manyi_list[1], manyi_list[2])
+
+    print(manyidu)
+    return manyidu
+
+import ast
+
+#转成2进制
+def  get_manyi_list(fram_list):
+    list_list = ast.literal_eval(fram_list)
+    manyi_list = ''
+    for x in list_list:
+        if len(x) == 1:
+            x = '0' + x
+        manyi_list = manyi_list +' '+ x
+
+    return manyi_list
 
 
 

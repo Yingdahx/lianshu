@@ -28,4 +28,5 @@ admin.site.register(Frame_data,Frame_dataAdmin)
 admin.site.register(Bao_Wei)
 admin.site.register(Yaun_Push_data)
 admin.site.register(Yaun_Frame_data)
+admin.site.register(Error)
 
