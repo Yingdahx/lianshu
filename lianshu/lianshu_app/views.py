@@ -383,6 +383,9 @@ def adjust(payload, *args):
         s -= min(p['N2'], 50) * adjust.P2
         s += 60 * adjust.P1 + 50 * adjust.P2
 
+    if s > 100:
+        s = 100-16.18*(100.0/s)
+
     return s
 
 
@@ -399,9 +402,9 @@ def get_manyi(deveui):
     adjust.P1 = 0.7
     adjust.P2 = 0.15
     manyidu = 0
-    manyi_list =['4c 4a 54 01 00 9c 02 00 5c 03 00 00 10 00 56 95 1f b9 20 19 03 06 12 20 32 33', 
-    '4c 4a 54 01 00 9c 02 00 5c 03 00 00 10 00 56 95 1f b9 20 19 03 06 12 20 32 33',
-    '4c 4a 54 01 00 9c 02 00 5c 03 00 00 10 00 56 95 1f b9 20 19 03 06 12 20 32 33']
+    # manyi_list =['4c 4a 54 01 00 9c 02 00 5c 03 00 00 10 00 56 95 1f b9 20 19 03 06 12 20 32 33', 
+    # '4c 4a 54 01 00 9c 02 00 5c 03 00 00 10 00 56 95 1f b9 20 19 03 06 12 20 32 33',
+    # '4c 4a 54 01 00 9c 02 00 5c 03 00 00 10 00 56 95 1f b9 20 19 03 06 12 20 32 33']
     if len(manyi_list) == 0:
         manyidu = 0
     elif len(manyi_list) == 1:
