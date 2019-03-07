@@ -123,8 +123,8 @@ def push(request):
     frame.machine_id = raw['deveui']
     frame.status = int(fram_list[13])
     frame.save()
-    # print('转码后入库的信息:','满溢度',int(fram_list[2]),'翻斗次数',int('0x'+fram_list[5],16),
-    #     '设备标识',fram_list[0] +  fram_list[1],'状态',int(fram_list[13]),'base64解析入库完成',sep='\n')
+    print('转码后入库的信息:','满溢度',frame.manyi,'翻斗次数',int('0x'+fram_list[5],16),
+        '设备标识',fram_list[0] +  fram_list[1],'状态',int(fram_list[13]),'base64解析入库完成',sep='\n')
 
     if 'gtw_info' in raw.keys() and raw['gtw_info']:
         print('gtw_info数据',raw['gtw_info'],sep='\n')
@@ -320,7 +320,7 @@ def yuanshishuju(raw):
                 data=data,
                 decode_list=str(fram_list),
                 count = raw['fcnt'],
-                manyi = int(fram_list[2]),
+                manyi = fram_list[2],
                 action = int('0x'+fram_list[5],16),
                 get_time = str(int(d_unix)),
                 online_time = str(int(on_date)),
