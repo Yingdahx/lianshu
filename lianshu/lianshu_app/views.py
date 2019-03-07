@@ -123,8 +123,8 @@ def push(request):
     frame.machine_id = raw['deveui']
     frame.status = int(fram_list[13])
     frame.save()
-    print('转码后入库的信息:','满溢度',int(fram_list[2]),'翻斗次数',int('0x'+fram_list[5],16),
-        '设备标识',fram_list[0] +  fram_list[1],'状态',int(fram_list[13]),'base64解析入库完成',sep='\n')
+    # print('转码后入库的信息:','满溢度',int(fram_list[2]),'翻斗次数',int('0x'+fram_list[5],16),
+    #     '设备标识',fram_list[0] +  fram_list[1],'状态',int(fram_list[13]),'base64解析入库完成',sep='\n')
 
     if 'gtw_info' in raw.keys() and raw['gtw_info']:
         print('gtw_info数据',raw['gtw_info'],sep='\n')
@@ -330,7 +330,7 @@ def yuanshishuju(raw):
                 )
     except Exception as e:
         Error.objects.create(error_id=raw['id'], error_address='base64转码报错报错', error_bw=raw)
-        print('Yaun_Frame_data.create' + e)
+        print('Yaun_Frame_data.create')
         pass
         
 
