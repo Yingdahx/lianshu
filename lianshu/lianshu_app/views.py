@@ -110,14 +110,15 @@ def push(request):
     frame.manyi = get_manyi_value                #第2位 满溢度 
     frame.action = int('0x'+fram_list[5],16)     #第5位 翻斗次数 转回十进制
     #拼接 生成datetime
-    f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),
-        hour=int(fram_list[22]),minute=int(fram_list[23]),second=int(fram_list[24]))
-    #转成时间戳 float -> int
-    d_unix = time.mktime(f_date.timetuple())
-    frame.get_time = str(int(d_unix))
+    # f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),
+    #     hour=int(fram_list[22]),minute=int(fram_list[23]),second=int(fram_list[24]))
+    # #转成时间戳 float -> int
+    # d_unix = time.mktime(f_date.timetuple())
+    
     #str -> datetime -> float -> int 
     timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
     on_date = time.mktime(timestr.timetuple())
+    frame.get_time = str(int(on_date))
     frame.online_time = str(int(on_date))
     frame.sta_id = str(int('0x'+fram_list[0],16)) + str(int('0x'+fram_list[1],16)) #16进制转10进制->str存储
     frame.machine_id = raw['deveui']
@@ -312,8 +313,8 @@ def yuanshishuju(raw):
         data = Yaun_Push_data.objects.filter(data_id=raw['id']).order_by('-create_time').first()
         if data:
             fram_list = base64_decode(raw['dataFrame'])
-            f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),hour=int(fram_list[22]),minute=int(fram_list[23]),second=int(fram_list[24]))
-            d_unix = time.mktime(f_date.timetuple())
+            # f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),hour=int(fram_list[22]),minute=int(fram_list[23]),second=int(fram_list[24]))
+            # d_unix = time.mktime(f_date.timetuple())
             timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
             on_date = time.mktime(timestr.timetuple())
             Yaun_Frame_data.objects.create(
@@ -322,7 +323,7 @@ def yuanshishuju(raw):
                 count = raw['fcnt'],
                 manyi = fram_list[2],
                 action = int('0x'+fram_list[5],16),
-                get_time = str(int(d_unix)),
+                get_time = str(int(on_date)),
                 online_time = str(int(on_date)),
                 sta_id = str(int('0x'+fram_list[0],16)) + str(int('0x'+fram_list[1],16)),
                 machine_id = raw['deveui'],
