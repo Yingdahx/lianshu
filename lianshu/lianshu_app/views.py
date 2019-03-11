@@ -26,9 +26,15 @@ def timechange(timestr):
     timetuple = time.strptime(timestr,'%Y-%m-%dT%H:%M:%S')
     timelist = list(timetuple)
     #时区与北京市区相差8小时 list -> time -> str
-    timelist[3] = timelist[3] + 8
+    # timelist[3] = timelist[3] + 8
     new_str = time.strftime('%Y-%m-%d %H:%M:%S',tuple(timelist))
-    return new_str
+    new_time = datetime.datetime.strptime(new_str, '%Y-%m-%d %H:%M:%S')
+    print(new_time,'=======>>>>')
+    time_jia = new_time + datetime.timedelta(hours=8)
+    print(time_jia)
+    new_str1 = str(time_jia)
+    print(new_str1)
+    return new_str1
 
 def base64_decode(base64_str):
     enstr = base64.b64decode(base64_str.encode('utf-8'))  #base64解码 16进制bytes
