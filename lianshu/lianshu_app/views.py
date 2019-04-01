@@ -291,10 +291,10 @@ def yuanshishuju(raw):
     
     xiaozhan_status_list = Xiaoyazhan.objects.filter(data_id=raw['deveui']).first()
     if xiaozhan_status_list:
-        print(xiaozhan_status_list.update_time)
-        xiaozhan_status_list.struts = xiaozhan_status_list.struts
+        print(xiaozhan_status_list.time_update)
+        xiaozhan_status_list.time_update = datetime.datetime.now()
         xiaozhan_status_list.save()
-        print(xiaozhan_status_list.update_time)
+        print(xiaozhan_status_list.time_update)
     else:
         Xiaoyazhan.objects.create(data_id=raw['deveui'])
 

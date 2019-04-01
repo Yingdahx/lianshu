@@ -203,10 +203,10 @@ class Xiaoyazhan(models.Model):
 	name = models.CharField(max_length=100,verbose_name='名称')
 	status = models.CharField(max_length=100,default='正常',verbose_name='状态')
 	address = models.CharField(max_length=200,default='',verbose_name = 'address')
-	update_time = models.DateTimeField(auto_now=True,verbose_name='修改时间')
+	time_update = models.DateTimeField(default=datetime.datetime.now,verbose_name='修改时间')
 
 	def __str__(self):
-		return '小站ID：' + str(self.data_id) + '，名称：' +  self.name + '，状态：' + str(self.status) + ',地址'+ self.address + ',修改时间' + str(self.update_time)
+		return '小站ID：' + str(self.data_id) + '，名称：' +  self.name + '，状态：' + str(self.status) + ',地址'+ self.address + ',修改时间' + str(self.time_update)
 
 
 class XiaoyazhanMainYidu(models.Model):
