@@ -1,4 +1,5 @@
 from django.db import models
+import datetime
 
 class Push_data(models.Model):
 	class Meta:
@@ -192,6 +193,37 @@ class Error(models.Model):
 
 	def __str__(self):
 		return '出错小站ID：' + self.error_id + '，出错位置：' +  self.error_address + '，出错时间：' + str(self.create_time)
+
+
+class Xiaoyazhan(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = '小压站表情况反馈表'
+
+	data_id = models.CharField(max_length=200,default='',verbose_name='ID')
+	name = models.CharField(max_length=100,verbose_name='名称')
+	status = models.CharField(max_length=100,default='正常',verbose_name='状态')
+	address = models.CharField(max_length=200,default='',verbose_name = 'address')
+	update_time = models.DateTimeField(auto_now=True,verbose_name='修改时间')
+
+	def __str__(self):
+		return '小站ID：' + str(self.data_id) + '，名称：' +  self.name + '，状态：' + str(self.status) + ',地址'+ self.address + ',修改时间' + str(self.update_time)
+
+
+class XiaoyazhanMainYidu(models.Model):
+
+	class Meta:
+		verbose_name = verbose_name_plural = '小压站满溢度表'
+
+	data_id = models.CharField(max_length=200,default='',verbose_name='ID')
+	manyi =  models.CharField(max_length=20,verbose_name='设备满溢参数',null=True)
+	time_update = models.CharField(max_length=200,verbose_name='修改时间')
+
+	def __str__(self):
+		return '小站ID：' + str(self.data_id) + '，满溢数：' +  self.manyi + ',:'+ self.time_update
+		
+
+
+	
 
 			
 			

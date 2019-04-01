@@ -1,0 +1,154 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+{% block content %}
+<div class="row">
+    <div class="col-xs-12" style="padding: 0 5%;">
+        <div class="box">
+            <div class="box-body">
+                <form action="" method='post' class="form-inline" id='query_form'>
+                  {% csrf_token %}
+                    
+                    <input type="text" class="form-control input-sm" name="name" style="width: 20%;" placeholder="小压站id或者名称" value="{{ name }}">
+                    <input type='hidden' name='action' value='search' />
+                    <input type='hidden' name='page' id='page' value='1' />
+                    <input type='hidden' name='pagesize' id='pagesize' value='{{ pagesize }}' />
+                    <input type="submit" class="btn btn-success" valuse="查询">
+                </form>
+            </div>
+        </div>
+
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">
+              
+          </h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table class="table table-hover table-bordered">
+              <tbody>
+              <tr>
+                <th>小压站id</th>
+                <th>名称</th>
+                <th>地址</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+              {% for v in xiaoyazhan_list %}
+              <tr>
+                <td>{{ v.data_id }}</td>
+                <td>{{ v.name }}</td>
+                <td>{{ v.address }}</td>
+                <td>{{ v.status }}</td>
+                
+                <td>
+                    <button type="button" data-toggle="modal" data-target="#modalEdit__{{v.id}}" class="btn btn-xs btn-primary">编辑</button>
+                </td>
+                    <div id="modalEdit__{{v.id}}" class="modal fade">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">×</span></button>
+                              <h6 class="modal-title">修改小压站信息</h6>
+                          </div>
+                          <div class="modal-body" style="height: 400px;">
+                          <!-- 修改表单             -->
+                            <form action='' method='post' class="form-horizontal" enctype="multipart/form-data">
+                              {% csrf_token %}
+                             <div class="box-body">
+                              <div class="form-group" style="height: 50px;">
+                                <label class="col-sm-2 control-label">小压站id</label>
+                                <div class="col-sm-10">
+                                  <input type="text" disabled class="form-control" value='{{v.data_id}}'>
+                                </div>
+                              </div>
+                              <div class="form-group" style="height: 50px;">
+                                <label  class="col-sm-2 control-label">名称</label>
+                                <div class="col-sm-10">
+                                  <input type="text" class="form-control" name="xiaoyazhan_name" value='{{v.name}}' required>
+                                </div>
+                              </div>
+                              <div class="form-group" style="height: 50px;">
+                                <label  class="col-sm-2 control-label">地址</label>
+                                <div class="col-sm-10">
+                                  <input type="text" class="form-control" name="address" value='{{v.address}}' required>
+                                </div>
+                              </div>
+                              <div class="form-group" style="height: 50px;">
+                                <label class="col-sm-2 control-label">状态</label>
+                                <div class="col-sm-10">
+                                  <select style='padding:2px'  name='status'
+                                    class="form-control input-sm jxt-form-input editable-select" value="{{v.status }}"required >
+                                      <option value=''>请选择</option>
+                                      <option value='正常' {% if v.status == '正常' %}selected {% endif %}>正常</option>
+                                      <option value='装修' {% if v.status == '装修' %}selected {% endif %}>装修</option>
+                                      <option value='未安装' {% if v.status == '未安装' %}selected {% endif %}>未安装</option>
+                                      <option value='断电' {% if v.status == '断电' %}selected {% endif %}>断电</option>
+                                      <option value='停运' {% if v.status == '停运' %}selected {% endif %}>停运</option>
+                                  </select>
+                                </div>
+                              </div>
+                              
+                              <input type='hidden' name='action' value='update' />
+                              <input type="hidden" name="id" value="{{ v.id }}" />
+                            </div>
+                            <div class="box-footer">
+                              <button type="submit" class="btn btn-info pull-right">保存</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                      </div>
+                    </div>
+
+
+
+
+              </tr>
+              {% empty %}
+                <tr class="text-center">
+                    <td colspan="6">无数据</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+          </table>
+            
+          <br>
+          <div class="dataTables_paginate paging_simple_numbers" style="padding:0">
+              <ul class="pagination" style="margin:0">
+                  {% if xiaoyazhan_list.has_previous %}
+                  <li class="paginate_button previous" id="example2_previous">
+                      <a onclick="$('input[name=page]').val({{ xiaoyazhan_list.previous_page_number }});$('#query_form').submit();" aria-controls="example2" data-dt-idx="0" tabindex="0">上一页</a>
+                  </li>
+                  {% endif %}
+                  {% for i in xiaoyazhan_list.paginator.page_range %}
+                  <li {% ifequal i  devices.number %}class="paginate_button active" {% else %}class="paginate_button"{% endifequal %}>
+                      <a onclick="$('input[name=page]').val({{ i }});$('#query_form').submit();" aria-controls="example2" data-dt-idx="{{ i }}" tabindex="0">{{ i }}</a>
+                  </li>
+                  {% endfor %}
+                  {% if xiaoyazhan_list.has_next %}
+                  <li class="paginate_button next" id="example2_next">
+                      <a onclick="$('input[name=page]').val({{ xiaoyazhan_list.next_page_number }});$('#query_form').submit();"  aria-controls="example2" data-dt-idx="7" tabindex="0">下一页</a>
+                  </li>
+                  {% endif %}
+              </ul>
+          </div>
+
+
+        </div>
+        <!-- /.box-body -->
+      </div>
+      <!-- /.box -->
+    </div>
+    <!-- /.col -->
+  </div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'jquery.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
+
+{% endblock %}
+

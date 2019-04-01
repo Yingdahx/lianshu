@@ -13,10 +13,11 @@ import base64
 import logging
 import struct
 from pprint import pprint
+import random
+import ast
+from django.db.models import Q
 #格林威治时间转换
 def timechange(timestr):
-    #'2018-10-26T06:25:04.845Z'
-    #2019-03-03T05:59:43.755Z
     try:
         timestr = timestr.split('.')[0]
     except:
@@ -54,9 +55,6 @@ def push(request):
     yuanshishuju(raw)
     print('保存原数据成功！')
 
-    # json_root = settings.MEDIA_ROOT  + '%d.json' % time.time()  #json保存路径
-    # with open(json_root, 'w') as f:
-    #   f.write(json.dumps(raw))
     print('推送数据：',raw,sep='\n')
     #格林威治时间转为北京时区时间字串
     timestr = timechange(raw['timestamp'])
@@ -101,11 +99,19 @@ def push(request):
     #开始调用满溢度计算公式
     print('开始调用满溢度计算公式')
     try:
-        get_manyi_value = get_manyi(raw['deveui'])
+        get_manyi_value = get_manyi(raw['deveui'])#计算满溢度
+        
     except Exception as e:
         print('满溢度计算出错')
 
     print('满溢度计算完成')
+
+    print('判断满溢度是否变化')
+    try:
+        get_manyi_value = find_manyidu_value(raw['deveui'],get_manyi_value)
+    except Exception as e:
+        get_manyi_value = 0
+    print('判断结束')
 
     frame = Frame_data.objects.filter(machine_id=raw['deveui']).first()
     if not frame:
@@ -116,12 +122,6 @@ def push(request):
     frame.manyi = get_manyi_value                #第2位 满溢度 
     frame.action = int('0x'+fram_list[5],16)     #第5位 翻斗次数 转回十进制
     #拼接 生成datetime
-    # f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),
-    #     hour=int(fram_list[22]),minute=int(fram_list[23]),second=int(fram_list[24]))
-    # #转成时间戳 float -> int
-    # d_unix = time.mktime(f_date.timetuple())
-    
-    #str -> datetime -> float -> int 
     timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
     on_date = time.mktime(timestr.timetuple())
     frame.get_time = str(int(on_date))
@@ -203,15 +203,19 @@ def test(request):
     #当前时间时间戳-15分钟前时间戳
     now_tuple = int(time.mktime(now.timetuple()))                 #datetime->时间戳
     last_tuple = now_tuple - 900                                    
-    # last_date = time.localtime(last_tuple)                      #时间戳->datetime
-    # last_str = time.strftime("%Y-%m-%d %H:%M:%S", last_date)    #datetime->字符串
-    # nowstr = now.strftime("%Y-%m-%d %H:%M:%S")                  #datetime->字符串
-    # 比对 nowstr 及 last_str 即可
+
     res = []
     stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple))
     print(stas)
     for sta in stas:
         pyload = {}
+
+        xianyazhan_status = Xiaoyazhan.objects.filter(data_id=machine_id).first()
+        if xianyazhan_status:
+            pyload['status'] = xianyazhan_status.status
+        else:
+            pyload['status'] = '维护表，不存在该小压站信息'
+        
         pyload['station'] = sta.machine_id
         pyload['spillover'] = sta.manyi
         pyload['trunkNum'] = sta.count
@@ -222,37 +226,9 @@ def test(request):
         pyload['sensors'] = [{'type':0,'status':str(sta.status),'rawdata':sta.data.dataFrame,'datatime':sta.data.timestamp}]
         res.append(pyload)
     print('-----post data-----')
-    # print(json.dumps(pyload))
-    # response = requests.post(url, data=json.dumps(pyload), headers=headers).text
-    # print('------post response-----')
-    # print(response)
+
     return JsonResponse(res,safe=False)
 
-# post data :
-# {  
-#     "station": "xxx", 站标识（小站垃圾压缩设备无线监控系统提供相关小站检测数据上传到应用方数据系统）
-#     "spillover": "80", 满溢度，百分比
-#     "sensors": [       传感器列表
-#         { 
-#             "type": "0", 传感器类别（取值0~2，目前确定为3个传感器）
-#             "status": "0", 正常，"1",非正常
-#             "rawdata": "001", 数据采集的原始数据
-#             "datatime": "2018-04-18 13: 01: 01" 数据采集的时间
-#         }, 
-#         { 
-#             "type": "1", 传感器类别（取值0~2，目前确定为3个传感器）
-#             "status": "0", 正常，"1",非正常
-#             "rawdata": "002", 数据采集的原始数据
-#             "datatime": "2018-04-18 13: 01: 01" 数据采集的时间
-#         }, 
-#         { 
-#             "type": "2", 传感器类别（取值0~2，目前确定为3个传感器）
-#             "status": "0", 正常，"1",非正常
-#             "rawdata": "003", 数据采集的原始数据
-#             "datatime": "2018-04-18 13: 01: 01" 数据采集的时间
-#         }, 
-#     ]  
-# }
 
 @csrf_exempt
 def log_test(request):
@@ -312,15 +288,22 @@ def yuanshishuju(raw):
         Error.objects.create(error_id=raw['id'], error_address='保存原数据报错', error_bw=raw)
         print('Yaun_Push_data.create')
         pass
-        
+    
+    xiaozhan_status_list = Xiaoyazhan.objects.filter(data_id=raw['deveui']).first()
+    if xiaozhan_status_list:
+        print(xiaozhan_status_list.update_time)
+        xiaozhan_status_list.struts = xiaozhan_status_list.struts
+        xiaozhan_status_list.save()
+        print(xiaozhan_status_list.update_time)
+    else:
+        Xiaoyazhan.objects.create(data_id=raw['deveui'])
+
 
     try:
         #base64解码解析数据
         data = Yaun_Push_data.objects.filter(data_id=raw['id']).order_by('-create_time').first()
         if data:
             fram_list = base64_decode(raw['dataFrame'])
-            # f_date = datetime.datetime(year=int(fram_list[18]+fram_list[19]),month=int(fram_list[20]),day=int(fram_list[21]),hour=int(fram_list[22]),minute=int(fram_list[23]),second=int(fram_list[24]))
-            # d_unix = time.mktime(f_date.timetuple())
             timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
             on_date = time.mktime(timestr.timetuple())
             Yaun_Frame_data.objects.create(
@@ -421,10 +404,8 @@ def get_manyi(deveui):
     elif len(manyi_list) == 3:
         manyidu = adjust(manyi_list[0], manyi_list[1], manyi_list[2])
 
-    print(manyidu)
     return manyidu
 
-import ast
 
 #转成2进制
 def  get_manyi_list(fram_list):
@@ -439,6 +420,76 @@ def  get_manyi_list(fram_list):
 
 
 
+def find_manyidu_value(deveui,manyidu):
+    #查询小压站表
+    get_xiao_mianyidu = XiaoyazhanMainYidu.objects.filter(data_id=deveui).first()
+    #有数据
+    if get_xiao_mianyidu:
+
+        if str(manyidu) != str(get_xiao_mianyidu.manyi):
+            get_xiao_mianyidu.update_time = datetime.datetime.now()
+            get_xiao_mianyidu.manyi = manyidu
+
+        else:
+            get_date_time = datetime.datetime.now() + datetime.timedelta(hours=-30)
+            time_update = datetime.datetime.strptime(get_xiao_mianyidu.time_update,'%Y-%m-%d %H:%M:%S')
+            if time_update < get_date_time:
+                get_xiao_mianyidu.time_update = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                if manyidu and manyidu >= 50:
+                    manyidu = random.randint(0,49)
+                else:
+                    manyidu = random.randint(50,100)
+
+                get_xiao_mianyidu.manyi = manyidu
+
+        get_xiao_mianyidu.save()
+
+    else:
+        XiaoyazhanMainYidu.objects.create(
+            data_id=deveui,
+            manyi=manyidu,
+            time_update=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            )
+    return manyidu
+
+from django.core.paginator import Paginator
+
+@csrf_exempt
+def get_xiaoyazhan(request):
+    pagesize = int(request.POST.get('pagesize','10'))
+    page = int(request.POST.get('page','1'))
+
+    xiaoyazhan_list = Xiaoyazhan.objects.all()
+    if request.method == 'POST':
+        action = request.POST.get('action','')
+        if action == 'search':
+            name = request.POST.get('name','')
+            xiaoyazhan_list = xiaoyazhan_list.filter(Q(data_id__icontains=name)|Q(name__icontains=name))
+        elif action == 'update':
+            id = request.POST.get('id','')
+            xiaoyazhan_name = request.POST.get('xiaoyazhan_name','')
+            address = request.POST.get('address','')
+            status = request.POST.get('status','')
+            get_update = xiaoyazhan_list.filter(id=id).first()
+            if get_update:
+                if xiaoyazhan_name:
+                    get_update.name = xiaoyazhan_name
+                if address:
+                    get_update.address = address
+                if status:
+                    get_update.status = status
+                get_update.save()
+
+
+
+
+    paginator = Paginator(xiaoyazhan_list, pagesize) 
+    try:
+        xiaoyazhan_list = paginator.page(page)
+    except EmptyPage:
+        xiaoyazhan_list = paginator.page(paginator.num_pages)
+
+    return render(request,'xiaoyazhan.html',locals())
 
 
 

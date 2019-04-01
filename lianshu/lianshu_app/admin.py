@@ -29,4 +29,6 @@ admin.site.register(Bao_Wei)
 admin.site.register(Yaun_Push_data)
 admin.site.register(Yaun_Frame_data)
 admin.site.register(Error)
+admin.site.register(Xiaoyazhan)
+admin.site.register(XiaoyazhanMainYidu)
 
