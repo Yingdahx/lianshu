@@ -178,6 +178,17 @@ def station(request):
         res['operation_num'] =  frame.action             #(垃圾翻斗动作了几次) int                     [5]
         res['update_time'] = frame.get_time              #(上次收到数据的时间) int （unix 时间戳）       [18] [24]
         res['online_time'] = frame.online_time           #(设备上线时间) int （unix 时间戳） 
+
+        try:
+            xianyazhan_status = Xiaoyazhan.objects.filter(data_id=station_id).first()
+            if xianyazhan_status:
+                res['status'] = xianyazhan_status.status
+            else:
+                res['status'] = '维护表，不存在该小压站信息'
+        except Exception as e:
+            res['status'] = '维护表，不存在该小压站信息'
+            pass
+
     else:
         ctx['code'] = 0
         ctx['message'] = '暂无该压站数据'
@@ -210,7 +221,7 @@ def test(request):
     for sta in stas:
         pyload = {}
 
-        xianyazhan_status = Xiaoyazhan.objects.filter(data_id=machine_id).first()
+        xianyazhan_status = Xiaoyazhan.objects.filter(data_id=sta.machine_id).first()
         if xianyazhan_status:
             pyload['status'] = xianyazhan_status.status
         else:
@@ -225,6 +236,9 @@ def test(request):
         #type字段暂时默认0
         pyload['sensors'] = [{'type':0,'status':str(sta.status),'rawdata':sta.data.dataFrame,'datatime':sta.data.timestamp}]
         res.append(pyload)
+
+        Push_history.objects.create(data_id=sta.machine_id, manyi=sta.manyi, time_update=now, bw=res)
+
     print('-----post data-----')
 
     return JsonResponse(res,safe=False)
@@ -439,6 +453,8 @@ def find_manyidu_value(deveui,manyidu):
                     manyidu = random.randint(0,49)
                 else:
                     manyidu = random.randint(50,100)
+
+                get_xiao_mianyidu.manyi_last = get_xiao_mianyidu.manyi#覆盖替换时的值
 
                 get_xiao_mianyidu.manyi = manyidu
 

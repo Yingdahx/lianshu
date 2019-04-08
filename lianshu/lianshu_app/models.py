@@ -216,7 +216,22 @@ class XiaoyazhanMainYidu(models.Model):
 
 	data_id = models.CharField(max_length=200,default='',verbose_name='ID')
 	manyi =  models.CharField(max_length=20,verbose_name='设备满溢参数',null=True)
+	manyi_last =  models.CharField(max_length=20, default = '', null=True, verbose_name='上一次修改时满溢参数')
 	time_update = models.CharField(max_length=200,verbose_name='修改时间')
+
+	def __str__(self):
+		return '小站ID：' + str(self.data_id) + '，满溢数：' +  self.manyi + ',:'+ self.time_update + ',上次满溢度:' + self.manyi_last
+
+
+class Push_history(models.Model):
+
+	class Meta:
+		verbose_name = verbose_name_plural = '推送历史数据保留'
+
+	data_id = models.CharField(max_length=200,default='',verbose_name='ID')
+	manyi =  models.CharField(max_length=20,verbose_name='设备满溢参数',null=True)
+	time_update = models.CharField(max_length=200,verbose_name='修改时间')
+	bw = models.CharField(max_length=2000,verbose_name='修改时间')
 
 	def __str__(self):
 		return '小站ID：' + str(self.data_id) + '，满溢数：' +  self.manyi + ',:'+ self.time_update

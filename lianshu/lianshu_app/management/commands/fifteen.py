@@ -36,6 +36,13 @@ class Command(BaseCommand):
         stas = Frame_data.objects.filter(online_time__range=(last_tuple,now_tuple))
         for sta in stas:
             pyload = {}
+
+            xianyazhan_status = Xiaoyazhan.objects.filter(data_id=sta.machine_id).first()
+            if xianyazhan_status:
+                pyload['status'] = xianyazhan_status.status
+            else:
+                pyload['status'] = '维护表，不存在该小压站信息'
+
             pyload['station'] = sta.machine_id
             pyload['spillover'] = sta.manyi
             pyload['trunkNum'] = sta.count
@@ -45,6 +52,12 @@ class Command(BaseCommand):
             #type字段暂时默认0
             pyload['sensors'] = [{'type':0,'status':str(sta.status),'rawdata':sta.data.dataFrame,'datatime':sta.data.timestamp}]
             res.append(pyload)
+
+            try:
+                Push_history.objects.create(data_id=sta.machine_id, manyi=sta.manyi, time_update=now, bw=res)
+            except Exception as e:
+                pass
+
         print('-----post data-----')
         print('-----post station num :'+str(len(res))+'-----')
 
