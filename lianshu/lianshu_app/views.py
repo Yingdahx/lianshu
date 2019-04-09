@@ -454,7 +454,7 @@ def find_manyidu_value(deveui,manyidu):
                 else:
                     manyidu = random.randint(50,100)
 
-                get_xiao_mianyidu.manyi_last = get_xiao_mianyidu.manyi#覆盖替换时的值
+                get_xiao_mianyidu.manyi_last = get_xiao_mianyidu.manyi + ',' + manyidu#覆盖替换时的值
 
                 get_xiao_mianyidu.manyi = manyidu
 
