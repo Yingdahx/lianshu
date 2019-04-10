@@ -216,7 +216,7 @@ class XiaoyazhanMainYidu(models.Model):
 
 	data_id = models.CharField(max_length=200,default='',verbose_name='ID')
 	manyi =  models.CharField(max_length=20,verbose_name='设备满溢参数',null=True)
-	manyi_last =  models.CharField(max_length=20, default = '', null=True, verbose_name='上一次修改时满溢参数')
+	manyi_last =  models.CharField(max_length=200, default = '', null=True, verbose_name='上一次修改时满溢参数')
 	time_update = models.CharField(max_length=200,verbose_name='修改时间')
 
 	def __str__(self):
