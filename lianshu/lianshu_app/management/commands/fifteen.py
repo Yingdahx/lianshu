@@ -63,15 +63,21 @@ class Command(BaseCommand):
 
         # logger.debug('-----post data-----')
         # logger.debug('-----post station:'+str(len(res)))
+
         try :
             response = requests.post(url, data=json.dumps(res), headers=headers).text
+            if 'Success' in response:
+                pass
+            else:
+                Error.objects.create(error_id=now, error_address='推送不成功', error_bw=response)
             print('-----post success-----'+response)
         except Exception as e:
             print('-----post failed-----')
             print('-----error-----')
             print(e)
             print('----------')
-            Error.objects.create(error_id=sta.machine_id, error_address='推送数据失败', error_bw=res)
+            Error.objects.create(error_id=now, error_address='推送数据失败', error_bw=response)
+
 
             # logger.error('-----post failed-----')
             # logger.error(e)
