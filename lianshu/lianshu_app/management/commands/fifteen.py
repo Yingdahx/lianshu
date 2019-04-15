@@ -71,6 +71,8 @@ class Command(BaseCommand):
             print('-----error-----')
             print(e)
             print('----------')
+            Error.objects.create(error_id=sta.machine_id, error_address='推送数据失败', error_bw=res)
+            pass
 
             # logger.error('-----post failed-----')
             # logger.error(e)
