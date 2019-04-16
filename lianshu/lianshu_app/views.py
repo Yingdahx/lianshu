@@ -445,7 +445,7 @@ def find_manyidu_value(deveui,manyidu):
             get_xiao_mianyidu.manyi = manyidu
 
         else:
-            get_date_time = datetime.datetime.now() + datetime.timedelta(hours=-30)
+            get_date_time = datetime.datetime.now() + datetime.timedelta(hours=-10)
             time_update = datetime.datetime.strptime(get_xiao_mianyidu.time_update,'%Y-%m-%d %H:%M:%S')
             if time_update < get_date_time:
                 get_xiao_mianyidu.time_update = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

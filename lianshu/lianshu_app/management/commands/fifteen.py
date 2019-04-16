@@ -54,7 +54,7 @@ class Command(BaseCommand):
             res.append(pyload)
 
             try:
-                Push_history.objects.create(data_id=sta.machine_id, manyi=sta.manyi, time_update=now, bw=res)
+                Push_history.objects.create(data_id=sta.machine_id, manyi=sta.manyi, time_update=now, bw=pyload)
             except Exception as e:
                 pass
 
