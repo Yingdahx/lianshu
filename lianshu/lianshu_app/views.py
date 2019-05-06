@@ -205,7 +205,8 @@ def test(request):
         }
     #请求地址
     # url = "http://101.89.135.132/compressionstation/spillover/add/" #prod
-    url = "http://101.89.135.80/compressionstation/spillover/add/"  #test
+    # url = "http://101.89.135.80/compressionstation/spillover/add/"  #test
+    url = "http://data.chi4rec.com.cn/compressionstation/spillover/add/"
 
     #当前时间
     now = datetime.datetime.now() #datetime
