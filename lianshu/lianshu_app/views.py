@@ -108,10 +108,12 @@ def push(request):
 
     print('判断满溢度是否变化')
     try:
-        get_manyi_value = find_manyidu_value(raw['deveui'],get_manyi_value)
+        fandou = int('0x'+fram_list[5],16)#翻斗数
+        get_manyi_value = find_manyidu_value(raw['deveui'],get_manyi_value,fandou)
     except Exception as e:
         get_manyi_value = 0
     print('判断结束')
+
 
     frame = Frame_data.objects.filter(machine_id=raw['deveui']).first()
     if not frame:
@@ -435,11 +437,23 @@ def  get_manyi_list(fram_list):
 
 
 
-def find_manyidu_value(deveui,manyidu):
+def find_manyidu_value(deveui,manyidu,fandou):
     #查询小压站表
     get_xiao_mianyidu = XiaoyazhanMainYidu.objects.filter(data_id=deveui).first()
     #有数据
     if get_xiao_mianyidu:
+        if int(manyidu) == 0 and int(fandou)>0:
+            if(fandou<=40):
+                manyidu = random.randint(10,fandou*2)
+            elif(fandou<80):
+                manyidu = random.randint(10,fandou)
+            else:
+                manyidu = random.randint(10,80)
+
+            get_xiao_mianyidu.update_time = datetime.datetime.now()
+            get_xiao_mianyidu.manyi = manyidu
+            return manyidu
+
 
         if str(manyidu) != str(get_xiao_mianyidu.manyi):
             get_xiao_mianyidu.update_time = datetime.datetime.now()
