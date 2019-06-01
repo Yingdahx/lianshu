@@ -440,8 +440,10 @@ def  get_manyi_list(fram_list):
 def find_manyidu_value(deveui,manyidu,fandou):
     #查询小压站表
     get_xiao_mianyidu = XiaoyazhanMainYidu.objects.filter(data_id=deveui).first()
+    
     #有数据
     if get_xiao_mianyidu:
+
         if int(manyidu) == 0 and int(fandou)>0:
             if(fandou<=40):
                 manyidu = random.randint(10,fandou*2)
@@ -452,34 +454,68 @@ def find_manyidu_value(deveui,manyidu,fandou):
 
             get_xiao_mianyidu.update_time = datetime.datetime.now()
             get_xiao_mianyidu.manyi = manyidu
+            get_xiao_mianyidu.save()
             return manyidu
 
+        get_date_time = datetime.datetime.now() + datetime.timedelta(hours=-10)
+        last_manyi = get_xiao_mianyidu.manyi_last.split(',')
 
-        if str(manyidu) != str(get_xiao_mianyidu.manyi):
-            get_xiao_mianyidu.update_time = datetime.datetime.now()
-            get_xiao_mianyidu.manyi = manyidu
+        #获取上次应为随机生成满溢度的时间
+        #在10小时以内，上次值和刚刚计算的值是一样的时候
+        flag = False
+        if get_xiao_mianyidu.last_time_update:
+            last_time_update = datetime.datetime.strptime(get_xiao_mianyidu.last_time_update,'%Y-%m-%d %H:%M:%S')
+            if get_date_time < last_time_update:
+                flag = True
+
+        flag1 = False
+        if get_xiao_mianyidu.last_time_update:
+            last_time_update = datetime.datetime.strptime(get_xiao_mianyidu.last_time_update,'%Y-%m-%d %H:%M:%S')
+            if get_date_time > last_time_update:
+                flag1 = True
+
+        #当满溢度不等于时
+        if flag and  len(last_manyi) == 2 and str(last_manyi[0]) == str(manyidu):
+            manyidu = get_xiao_mianyidu.manyi
+
+        elif str(manyidu) != str(get_xiao_mianyidu.manyi):
+            #大于10小时，上次值相等时
+            if flag1 and len(last_manyi) == 2 and str(last_manyi[0]) == str(manyidu):
+                get_xiao_mianyidu.time_update = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')#修改时间
+                get_xiao_mianyidu.last_time_update = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')#10小时值不变修改的时间
+                if manyidu and manyidu >= 50:
+                    manyidu = random.randint(0,49)
+                else:
+                    manyidu = random.randint(50,100)
+
+                get_xiao_mianyidu.manyi_last = str(last_manyi[0]) + ',' + str(manyidu)#覆盖替换时的值
+                get_xiao_mianyidu.manyi = manyidu
+
+            else:
+                get_xiao_mianyidu.time_update = datetime.datetime.now()
+                get_xiao_mianyidu.manyi_last = str(get_xiao_mianyidu.manyi) + ',' + str(manyidu)#覆盖替换时的值
+                get_xiao_mianyidu.manyi = manyidu
 
         else:
-            get_date_time = datetime.datetime.now() + datetime.timedelta(hours=-10)
             time_update = datetime.datetime.strptime(get_xiao_mianyidu.time_update,'%Y-%m-%d %H:%M:%S')
             if time_update < get_date_time:
-                get_xiao_mianyidu.time_update = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                get_xiao_mianyidu.time_update = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')#修改时间
+                get_xiao_mianyidu.last_time_update = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')#10小时值不变修改的时间
+
                 if manyidu and manyidu >= 50:
                     manyidu = random.randint(0,49)
                 else:
                     manyidu = random.randint(50,100)
 
                 get_xiao_mianyidu.manyi_last = str(get_xiao_mianyidu.manyi) + ',' + str(manyidu)#覆盖替换时的值
-
                 get_xiao_mianyidu.manyi = manyidu
 
         get_xiao_mianyidu.save()
-
     else:
         XiaoyazhanMainYidu.objects.create(
             data_id=deveui,
             manyi=manyidu,
-            time_update=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            time_update=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             )
     return manyidu
 

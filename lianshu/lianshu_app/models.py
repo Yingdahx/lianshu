@@ -218,7 +218,7 @@ class XiaoyazhanMainYidu(models.Model):
 	manyi =  models.CharField(max_length=20,verbose_name='设备满溢参数',null=True)
 	manyi_last =  models.CharField(max_length=200, default = '', null=True, verbose_name='上一次修改时满溢参数')
 	time_update = models.CharField(max_length=200,verbose_name='修改时间')
-
+	last_time_update = models.CharField(max_length=200,default='', verbose_name='超过10小时还是相同的时候，改变的时间')
 	def __str__(self):
 		return '小站ID：' + str(self.data_id) + '，满溢数：' +  self.manyi + ',:'+ self.time_update + ',上次满溢度:' + self.manyi_last
 
