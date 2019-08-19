@@ -30,10 +30,10 @@ class Command(BaseCommand):
         url = "http://data.chi4rec.com.cn/compressionstation/spillover/add/"  #test
 
         #推送时间段内的数据
-        res = []
-        get_bao_list = Bao_Wei.objects.filter(create_time__range=('2019-08-15 23:00','2019-08-19 00:00'),
-            bw_input_txt__icontains='6001771808120055').order_by('create_time')
+        
+        get_bao_list = Bao_Wei.objects.filter(create_time__range=('2019-08-15 23:00','2019-08-19 00:00')).order_by('create_time')
         for x in get_bao_list:
+            res = []
             pyload = {}
             if x.bw_input_txt:
                 if x.bw_input_txt:
