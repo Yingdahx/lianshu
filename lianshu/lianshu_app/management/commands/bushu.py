@@ -31,7 +31,8 @@ class Command(BaseCommand):
 
         #推送时间段内的数据
         res = []
-        get_bao_list = Bao_Wei.objects.filter(create_time__range=('2019-08-15 23:00','2019-08-19 00:00')).order_by('create_time')
+        get_bao_list = Bao_Wei.objects.filter(create_time__range=('2019-08-15 23:00','2019-08-19 00:00'),
+            bw_input_txt__icontains='6001771808120055').order_by('create_time')
         for x in get_bao_list:
             pyload = {}
             if x.bw_input_txt:
@@ -79,6 +80,7 @@ class Command(BaseCommand):
                 print(e)
                 print('----------')
                 Error.objects.create(error_id=now, error_address='推送数据失败', error_bw=response)
-            print('==============>>>'+ str(x.create_time))
-            Error.objects.create(error_id=now, error_address='补数据', error_bw=x.create_time)
+            print('==============>>>',str(x.create_time),'****',str(raw['deveui']))
+            Error.objects.create(error_id=now, error_address='补数据', 
+                error_bw=str(x.create_time)+ '=====' + str(raw['deveui']))
 
