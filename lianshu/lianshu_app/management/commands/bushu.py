@@ -20,8 +20,8 @@ class Command(BaseCommand):
         print('-----post begin-----')
         # logger.info('-----'+str(now)+'-----')
         # logger.info('-----post begin-----')
-        now_tuple = int(time.mktime(now.timetuple()))                 #datetime->时间戳
-        last_tuple = now_tuple - 900                                  #15分钟前的时间戳   
+        # now_tuple = int(time.mktime(now.timetuple()))                 #datetime->时间戳
+        # last_tuple = now_tuple - 900                                  #15分钟前的时间戳   
 
         headers = {
             "Content-Type": "application/json; charset=UTF-8",
@@ -33,7 +33,6 @@ class Command(BaseCommand):
         res = []
         get_bao_list = Bao_Wei.objects.filter(create_time__range=('2019-08-15 00:00','2019-08-19 00:00')).order_by('create_time')
         for x in get_bao_list:
-            # print(x.create_time,'pppppppp')
             pyload = {}
             if x.bw_input_txt:
                 if x.bw_input_txt:
@@ -80,6 +79,6 @@ class Command(BaseCommand):
                 print(e)
                 print('----------')
                 Error.objects.create(error_id=now, error_address='推送数据失败', error_bw=response)
-            print('==============>>>'+x.create_time)
+            print('==============>>>'+ str(x.create_time))
             Error.objects.create(error_id=now, error_address='补数据', error_bw=x.create_time)
 
