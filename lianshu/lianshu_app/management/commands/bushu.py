@@ -49,6 +49,8 @@ class Command(BaseCommand):
                         get_manyi_value = v.get_manyi(raw['deveui'])#计算满溢度
                         
                     except Exception as e:
+                        print('-----失败了-----')
+                        get_manyi_value = 0
 
                     try:
                         fandou = int('0x'+fram_list[5],16)#翻斗数
@@ -78,6 +80,6 @@ class Command(BaseCommand):
                 print(e)
                 print('----------')
                 Error.objects.create(error_id=now, error_address='推送数据失败', error_bw=response)
-            print('==============>>>'+ x.create_time)
+            print('==============>>>'+x.create_time)
             Error.objects.create(error_id=now, error_address='补数据', error_bw=x.create_time)
 
