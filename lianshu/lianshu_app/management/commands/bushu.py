@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
         #推送时间段内的数据
         res = []
-        get_bao_list = Bao_Wei.objects.filter(create_time__range=('2019-08-15 00:00','2019-08-19 00:00')).order_by('create_time')
+        get_bao_list = Bao_Wei.objects.filter(create_time__range=('2019-08-15 23:00','2019-08-19 00:00')).order_by('create_time')
         for x in get_bao_list:
             pyload = {}
             if x.bw_input_txt:

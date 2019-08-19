@@ -78,7 +78,7 @@ class Command(BaseCommand):
             print('----------')
             Error.objects.create(error_id=now, error_address='推送数据失败', error_bw=response)
 
-
+        exit(1)
             # logger.error('-----post failed-----')
             # logger.error(e)
         
