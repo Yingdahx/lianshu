@@ -25,7 +25,5 @@ urlpatterns = [
     path('test/',views.test),
     path('log_test/',views.log_test),
     path('lianshu/xiaoyazhan',views.get_xiaoyazhan),
-    path('bu_shu/', views.bu_shu),
-
 
 ]
