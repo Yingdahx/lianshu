@@ -45,22 +45,17 @@ class Command(BaseCommand):
                         pyload['status'] = '维护表，不存在该小压站信息'
 
                     #开始调用满溢度计算公式
-                    print('开始调用满溢度计算公式')
                     try:
                         get_manyi_value = v.get_manyi(raw['deveui'])#计算满溢度
                         
                     except Exception as e:
-                        print('满溢度计算出错')
 
-                    print('满溢度计算完成')
-
-                    print('判断满溢度是否变化')
                     try:
                         fandou = int('0x'+fram_list[5],16)#翻斗数
                         get_manyi_value = v.find_manyidu_value(raw['deveui'],get_manyi_value,fandou)
                     except Exception as e:
                         get_manyi_value = 0
-                    print('判断结束')
+                    
 
                     fram_list = v.base64_decode(raw['dataFrame'])
                     pyload['station'] = int(raw['deveui'])
@@ -71,20 +66,18 @@ class Command(BaseCommand):
                     pyload['onlineTime'] = time.mktime(x.create_time.timetuple())
                     pyload['sensors'] = [{'type':0,'status':str('1'),'rawdata':raw['dataFrame'],'datatime':x.create_time.strftime('%Y-%m-%d %H:%M:%S')}]
                     res.append(pyload)
-        # print(res)
-        try :
-            response = requests.post(url, data=json.dumps(res), headers=headers).text
-            if 'Success' in response:
-                pass
-            else:
-                Error.objects.create(error_id=now, error_address='推送不成功', error_bw=response)
-            print('-----post success-----'+response)
-        except Exception as e:
-            print('-----post failed-----')
-            print('-----error-----')
-            print(e)
-            print('----------')
-            Error.objects.create(error_id=now, error_address='推送数据失败', error_bw=response)
-
-        Error.objects.create(error_id=now, error_address='推送成功', error_bw='')
+            try :
+                response = requests.post(url, data=json.dumps(res), headers=headers).text
+                if 'Success' in response:
+                    pass
+                else:
+                    Error.objects.create(error_id=now, error_address='推送不成功', error_bw=response)
+                print('-----post success-----'+response)
+            except Exception as e:
+                print('-----post failed-----')
+                print(e)
+                print('----------')
+                Error.objects.create(error_id=now, error_address='推送数据失败', error_bw=response)
+            print('==============>>>'+ x.create_time)
+            Error.objects.create(error_id=now, error_address='补数据', error_bw=x.create_time)
 
