@@ -75,11 +75,12 @@ class Command(BaseCommand):
                         print('-----post failed-----')
                         print(e)
                         Error.objects.create(error_id=now, error_address='补数据失败', error_bw=response)
-                    print('==============>>>',str(x.create_time),'****',str(raw['deveui']))
-                    Error.objects.create(error_id=now, error_address='补数据', 
-                        error_bw=str(x.create_time)+ '=====' + str(raw['deveui']))
                     i = 0
                     res = []
+
+                print('==============>>>',str(x.create_time),'****',str(raw['deveui']))
+                Error.objects.create(error_id=now, error_address='补数据', 
+                    error_bw=str(x.create_time)+ '=====' + str(raw['deveui']))
 
         try :
             response = requests.post(url, data=json.dumps(res), headers=headers).text
@@ -92,6 +93,3 @@ class Command(BaseCommand):
             print('-----post failed-----')
             print(e)
             Error.objects.create(error_id=now, error_address='补数据失败', error_bw=response)
-        print('==============>>>',str(x.create_time),'****',str(raw['deveui']))
-        Error.objects.create(error_id=now, error_address='补数据', 
-            error_bw=str(x.create_time)+ '=====' + str(raw['deveui']))
