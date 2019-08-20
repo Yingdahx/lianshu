@@ -32,5 +32,6 @@ admin.site.register(Error)
 admin.site.register(Xiaoyazhan)
 admin.site.register(XiaoyazhanMainYidu)
 admin.site.register(Push_history)
+admin.site.register(Manyi)
 
 

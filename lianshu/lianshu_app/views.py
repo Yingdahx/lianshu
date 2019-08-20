@@ -113,8 +113,13 @@ def push(request):
         get_manyi_value = find_manyidu_value(raw['deveui'],get_manyi_value,fandou)
     except Exception as e:
         get_manyi_value = 0
+        print(e)
     print('判断结束')
 
+    get_manyidu = Manyi.objects.filter(machine_id=raw['deveui']).order_by('-create_time').first()
+    if get_manyidu:
+        get_manyidu.zuizhong_manyidu = get_manyi_value
+        get_manyidu.save()
 
     frame = Frame_data.objects.filter(machine_id=raw['deveui']).first()
     if not frame:
@@ -422,6 +427,7 @@ def get_manyi(deveui):
     elif len(manyi_list) == 3:
         manyidu = adjust(manyi_list[0], manyi_list[1], manyi_list[2])
 
+    Manyi.objects.create(machine_id=deveui, manyidu=manyidu, manyidu_list=manyi_list)
     return manyidu
 
 
@@ -498,7 +504,7 @@ def find_manyidu_value(deveui,manyidu,fandou):
                 get_xiao_mianyidu.manyi = manyidu
 
         else:
-            time_update = datetime.datetime.strptime(get_xiao_mianyidu.time_update,'%Y-%m-%d %H:%M:%S')
+            time_update = datetime.datetime.strptime(get_xiao_mianyidu.time_update.split('.')[0],'%Y-%m-%d %H:%M:%S')
             if time_update < get_date_time:
                 get_xiao_mianyidu.time_update = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')#修改时间
                 get_xiao_mianyidu.last_time_update = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')#10小时值不变修改的时间

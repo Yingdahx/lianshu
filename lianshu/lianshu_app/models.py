@@ -235,8 +235,18 @@ class Push_history(models.Model):
 
 	def __str__(self):
 		return '小站ID：' + str(self.data_id) + '，满溢数：' +  self.manyi + ',:'+ self.time_update
-		
 
+
+class Manyi(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = '满溢度计算'
+
+	machine_id = models.CharField(max_length=200,default='',verbose_name='ID')
+	manyidu =  models.CharField(max_length=20,verbose_name='设备满溢参数',null=True)
+	manyidu_list = models.CharField(max_length=200,default='',verbose_name='满溢度list')
+	zuizhong_manyidu = models.CharField(max_length=20,verbose_name='最终',null=True)
+	create_time = models.DateTimeField(auto_now_add=True,verbose_name='创建时间',null=True)
+	update_time = models.DateTimeField(auto_now=True,verbose_name='修改时间')
 
 	
 
