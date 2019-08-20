@@ -99,6 +99,7 @@ def push(request):
 
     #开始调用满溢度计算公式
     print('开始调用满溢度计算公式')
+    get_manyi_value = 0
     try:
         get_manyi_value = get_manyi(raw['deveui'])#计算满溢度
         
