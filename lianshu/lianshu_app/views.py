@@ -111,7 +111,7 @@ def push(request):
     print('判断满溢度是否变化')
     try:
         fandou = int('0x'+fram_list[5],16)#翻斗数
-        get_manyi_value = find_manyidu_value(raw['deveui'],get_manyi_value,fandou)
+        # get_manyi_value = find_manyidu_value(raw['deveui'],get_manyi_value,fandou)
     except Exception as e:
         get_manyi_value = 0
         print(e)
