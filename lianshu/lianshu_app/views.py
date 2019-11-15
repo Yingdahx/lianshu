@@ -73,7 +73,6 @@ def push(request):
     data.rssi = raw['rssi']
     data.snr = raw['snr']
     data.freq = raw['freq']
-    data.devId = raw['devId']
     data.appId = raw['appId']
     data.sf_used = raw['sf_used']
     data.dr_used = raw['dr_used']
@@ -81,11 +80,6 @@ def push(request):
     data.device_redundancy = raw['device_redundancy']
     data.time_on_air_ms = raw['time_on_air_ms']
     data.decrypted = raw['decrypted']
-    data.status = raw['status']
-    data.address = raw['address']
-    data.name = raw['name']
-    data.longitude = raw['longitude']
-    data.latitude = raw['latitude']
     data.alive = raw['live']
     try:
         data.save()
@@ -137,7 +131,6 @@ def push(request):
     frame.online_time = str(int(on_date))
     frame.sta_id = str(int('0x'+fram_list[0],16)) + str(int('0x'+fram_list[1],16)) #16进制转10进制->str存储
     frame.machine_id = raw['deveui']
-    frame.status = int(fram_list[13])
     frame.save()
     print('转码后入库的信息:','满溢度',frame.manyi,'翻斗次数',int('0x'+fram_list[5],16),
         '设备标识',fram_list[0] +  fram_list[1],'状态',int(fram_list[13]),'base64解析入库完成',sep='\n')
@@ -157,11 +150,10 @@ def push(request):
     if 'ExtraProperty' in raw.keys() and raw['ExtraProperty']:
         print('ExtraProperty数据',raw['ExtraProperty'],sep='\n')
         for e in raw['ExtraProperty']:
-            extra = ExtraProperty.objects.filter(data=data,devId=e['devId'],extra_id=e['id'],name=e['name'],value=e['value']).first()
+            extra = ExtraProperty.objects.filter(data=data,extra_id=e['id'],name=e['name'],value=e['value']).first()
             if not extra:
                 extra = ExtraProperty()
             extra.data = data
-            extra.devId = e['devId']
             extra.extra_id = e['id']
             extra.name = e['name']
             extra.value = e['value']
@@ -293,7 +285,6 @@ def yuanshishuju(raw):
             rssi = raw['rssi'],
             snr = raw['snr'],
             freq = raw['freq'],
-            devId = raw['devId'],
             appId = raw['appId'],
             sf_used = raw['sf_used'],
             dr_used = raw['dr_used'],
@@ -301,11 +292,6 @@ def yuanshishuju(raw):
             device_redundancy = raw['device_redundancy'],
             time_on_air_ms = raw['time_on_air_ms'],
             decrypted = raw['decrypted'],
-            status = raw['status'],
-            address = raw['address'],
-            name = raw['name'],
-            longitude = raw['longitude'],
-            latitude = raw['latitude'],
             alive = raw['live']
             )
     except Exception as e:
@@ -339,8 +325,7 @@ def yuanshishuju(raw):
                 get_time = str(int(on_date)),
                 online_time = str(int(on_date)),
                 sta_id = str(int('0x'+fram_list[0],16)) + str(int('0x'+fram_list[1],16)),
-                machine_id = raw['deveui'],
-                status = int(fram_list[13])
+                machine_id = raw['deveui']
                 )
     except Exception as e:
         Error.objects.create(error_id=raw['id'], error_address='base64转码报错报错', error_bw=raw)
