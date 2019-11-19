@@ -95,20 +95,20 @@ def push(request):
     print('开始调用满溢度计算公式')
     get_manyi_value = 0
     try:
-        get_manyi_value = get_manyi(raw['deveui'])#计算满溢度
-        
+        # get_manyi_value = get_manyi(raw['deveui'])#计算满溢度
+        get_manyi_value = raw['deveui']
     except Exception as e:
         print('满溢度计算出错')
 
     print('满溢度计算完成')
 
     print('判断满溢度是否变化')
-    try:
-        fandou = int('0x'+fram_list[5],16)#翻斗数
-        # get_manyi_value = find_manyidu_value(raw['deveui'],get_manyi_value,fandou)
-    except Exception as e:
-        get_manyi_value = 0
-        print(e)
+    # try:
+    #     fandou = int('0x'+fram_list[5],16)#翻斗数
+    #     # get_manyi_value = find_manyidu_value(raw['deveui'],get_manyi_value,fandou)
+    # except Exception as e:
+    #     get_manyi_value = 0
+    #     print(e)
     print('判断结束')
 
     get_manyidu = Manyi.objects.filter(machine_id=raw['deveui']).order_by('-create_time').first()
