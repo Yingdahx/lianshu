@@ -95,12 +95,13 @@ def push(request):
     print('开始调用满溢度计算公式')
     get_manyi_value = 0
     try:
+        get_manyi_value = int(fram_list[2])
         # get_manyi_value = get_manyi(raw['deveui'])#计算满溢度
-        get_manyi_value = raw['deveui']
+        # get_manyi_value = raw['deveui']
     except Exception as e:
         print('满溢度计算出错')
 
-    print('满溢度计算完成')
+    print('满溢度计算完成', str(get_manyi_value))
 
     print('判断满溢度是否变化')
     # try:
@@ -122,7 +123,7 @@ def push(request):
     frame.data =  data
     frame.decode_list = str(fram_list)
     frame.count = raw['fcnt']                       #第几箱垃圾  暂用FCNT字段
-    frame.manyi = get_manyi_value                #第2位 满溢度 
+    frame.manyi = int(fram_list[2])                #第2位 满溢度 
     frame.action = int('0x'+fram_list[5],16)     #第5位 翻斗次数 转回十进制
     #拼接 生成datetime
     timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
