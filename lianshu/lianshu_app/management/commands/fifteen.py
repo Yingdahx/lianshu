@@ -43,6 +43,10 @@ class Command(BaseCommand):
             else:
                 pyload['status'] = '维护表，不存在该小压站信息'
 
+            manyidu = int(float(sta.manyi) * 1.65)
+            if manyidu > 100:
+                manyidu = 100
+
             pyload['station'] = sta.machine_id
             pyload['spillover'] = sta.manyi
             pyload['trunkNum'] = sta.count
@@ -54,7 +58,7 @@ class Command(BaseCommand):
             res.append(pyload)
 
             try:
-                Push_history.objects.create(data_id=sta.machine_id, manyi=sta.manyi, time_update=now, bw=pyload)
+                Push_history.objects.create(data_id=sta.machine_id, manyi=manyidu, time_update=now, bw=pyload)
             except Exception as e:
                 pass
 
