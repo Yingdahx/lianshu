@@ -48,7 +48,7 @@ class Command(BaseCommand):
                 manyidu = 100
 
             pyload['station'] = sta.machine_id
-            pyload['spillover'] = sta.manyi
+            pyload['spillover'] = manyidu
             pyload['trunkNum'] = sta.count
             pyload['operationNum'] = sta.action
             pyload['refreshTime'] = sta.get_time
