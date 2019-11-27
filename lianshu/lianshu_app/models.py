@@ -27,10 +27,10 @@ class Push_data(models.Model):
 	status = models.CharField(max_length=200,default='',verbose_name = 'status')
 	address = models.CharField(max_length=200,default='',verbose_name = 'address')
 	name = models.CharField(max_length=200,default='',null=True,verbose_name = 'name')
-	longitude = models.DecimalField(max_digits=15,decimal_places=1,verbose_name = 'longitude')
-	latitude = models.DecimalField(max_digits=15,decimal_places=1,verbose_name = 'latitude')
+	longitude = models.DecimalField(max_digits=15,decimal_places=1, null=True,verbose_name = 'longitude')
+	latitude = models.DecimalField(max_digits=15,decimal_places=1, null=True, verbose_name = 'latitude')
 	alive = models.CharField(max_length=200,default='',verbose_name='是否在线')
-	data_hex = models.CharField(max_length=200,default='',verbose_name='解码处理后的16字节list字符串')
+	data_hex = models.CharField(max_length=200,default='', verbose_name='解码处理后的16字节list字符串')
 
 	def __str__(self):
 		return 'ID:' + str(self.data_id) + '     设备的EUI:' + self.deveui + '     数据上报时间' + self.timestamp 

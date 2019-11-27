@@ -100,6 +100,8 @@ def push(request):
         # get_manyi_value = raw['deveui']
     except Exception as e:
         print('满溢度计算出错')
+        frame_data_manyi = Frame_data.objects.filter(machine_id=raw['deveui']).first()
+        get_manyi_value = frame_data_manyi.manyi if frame_data_manyi else 0
 
     print('满溢度计算完成', str(get_manyi_value))
 
@@ -123,7 +125,7 @@ def push(request):
     frame.data =  data
     frame.decode_list = str(fram_list)
     frame.count = raw['fcnt']                       #第几箱垃圾  暂用FCNT字段
-    frame.manyi = int(fram_list[2])                #第2位 满溢度 
+    frame.manyi = int(get_manyi_value)                #第2位 满溢度 
     frame.action = int('0x'+fram_list[5],16)     #第5位 翻斗次数 转回十进制
     #拼接 生成datetime
     timestr = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M:%S')    
@@ -269,10 +271,12 @@ def log_test(request):
 def yuanshishuju(raw):
     try:
         Bao_Wei.objects.create(bw_name='小压站', bw_input_txt=raw)
-        
+        manyi = fram_list[2]
     except Exception as e:
         print(e)
-        pass
+        frame_data_manyi = Frame_data.objects.filter(machine_id=raw['deveui']).first()
+        get_manyi_value = frame_data_manyi.manyi if frame_data_manyi else 0
+
     try:
         timestr = timechange(raw['timestamp'])
         Yaun_Push_data.objects.create(
@@ -321,7 +325,7 @@ def yuanshishuju(raw):
                 data=data,
                 decode_list=str(fram_list),
                 count = raw['fcnt'],
-                manyi = fram_list[2],
+                manyi = manyi,
                 action = int('0x'+fram_list[5],16),
                 get_time = str(int(on_date)),
                 online_time = str(int(on_date)),
